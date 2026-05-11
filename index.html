@@ -12,7 +12,6 @@
         overscroll-behavior: none;
       }
 
-
       @font-face {
         font-family: "Archivo";
         src: url("fonts/Archivo/static/Archivo-Regular.ttf") format("truetype");
@@ -71,7 +70,7 @@
         --blue-pale: #d6e0ff;
         --gray: #888888;
         --black: #28282b;
-        --white: #ffffff;
+        --white: #fefefe;
 
         /* Layout */
         --content-width: 90%;
@@ -96,8 +95,8 @@
         color: var(--color-fg);
         background-color: var(--color-bg-inverse);
         background-image:
-          linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px);
+          linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
         background-size: 40px 40px;
         min-height: 100vh;
       }
@@ -122,7 +121,7 @@
         position: relative;
       }
 
-      /* initial hidden states: prevents flash before GSAP runs */
+      /* hidden before GSAP runs; -0.2em bottom gives descenders room during the wipe-up reveal */
       h1,
       .subtitle {
         clip-path: inset(120% 0 -0.2em 0);
@@ -147,6 +146,7 @@
         letter-spacing: 0.02em;
         text-transform: uppercase;
         position: relative;
+        padding-bottom: 4px;
       }
 
       nav a::after {
@@ -192,16 +192,15 @@
         to { opacity: 0.45; }
       }
 
-
       .hero-portrait {
         position: absolute;
         bottom: 0;
         right: 0;
-        height: min(60.5vw, 85vh, 858px);
+        height: min(max(60.5vw, 70vh), 858px);
         width: auto;
         clip-path: inset(0 0 100% 0);
         filter: drop-shadow(0px 6px 8px rgba(0, 5, 20, 0.20));
-        animation: portraitWipeUp 1.0s cubic-bezier(0.16, 1, 0.3, 1) 2.5s forwards;
+        animation: portraitWipeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 2.5s forwards;
         transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                     filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       }
@@ -222,6 +221,7 @@
         line-height: 1.05;
         color: var(--color-accent);
         letter-spacing: -0.02em;
+        /* stroke painted beneath fill so it doesn't erode letter shapes */
         -webkit-text-stroke: 4px var(--color-bg);
         paint-order: stroke fill;
       }
@@ -275,6 +275,7 @@
         font-size: clamp(1.25rem, 3vw, 3rem);
         color: var(--color-accent);
         margin-top: 0.5rem;
+        /* stroke painted beneath fill so it doesn't erode letter shapes */
         -webkit-text-stroke: 4px var(--color-bg);
         paint-order: stroke fill;
       }
@@ -303,7 +304,7 @@
         background: white;
         filter: url(#paper-noise);
         mix-blend-mode: multiply;
-        opacity: 0.3;
+        opacity: 0.2;
         pointer-events: none;
         z-index: 10;
       }
@@ -337,12 +338,12 @@
 
       .interstitial::before {
         left: 0;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='48'%3E%3Cpolygon points='27,24 25.73,26.07 25.79,28.5 23.66,29.66 22.5,31.79 20.07,31.73 18,33 15.93,31.73 13.5,31.79 12.34,29.66 10.21,28.5 10.27,26.07 9,24 10.27,21.93 10.21,19.5 12.34,18.34 13.5,16.21 15.93,16.27 18,15 20.07,16.27 22.5,16.21 23.66,18.34 25.79,19.5 25.73,21.93' fill='%231a56ff'/%3E%3Cline x1='35' y1='0' x2='35' y2='48' stroke='%23888888' stroke-width='1' stroke-dasharray='4,4'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='48'%3E%3Cpolygon points='27,24 25.73,26.07 25.79,28.5 23.66,29.66 22.5,31.79 20.07,31.73 18,33 15.93,31.73 13.5,31.79 12.34,29.66 10.21,28.5 10.27,26.07 9,24 10.27,21.93 10.21,19.5 12.34,18.34 13.5,16.21 15.93,16.27 18,15 20.07,16.27 22.5,16.21 23.66,18.34 25.79,19.5 25.73,21.93' fill='%231a56ff'/%3E%3Cline x1='35' y1='0' x2='35' y2='48' stroke='%237a9fff' stroke-width='1' stroke-dasharray='8,4'/%3E%3C/svg%3E");
       }
 
       .interstitial::after {
         right: 0;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='48'%3E%3Cpolygon points='27,24 25.73,26.07 25.79,28.5 23.66,29.66 22.5,31.79 20.07,31.73 18,33 15.93,31.73 13.5,31.79 12.34,29.66 10.21,28.5 10.27,26.07 9,24 10.27,21.93 10.21,19.5 12.34,18.34 13.5,16.21 15.93,16.27 18,15 20.07,16.27 22.5,16.21 23.66,18.34 25.79,19.5 25.73,21.93' fill='%231a56ff'/%3E%3Cline x1='1' y1='0' x2='1' y2='48' stroke='%23888888' stroke-width='1' stroke-dasharray='4,4'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='48'%3E%3Cpolygon points='27,24 25.73,26.07 25.79,28.5 23.66,29.66 22.5,31.79 20.07,31.73 18,33 15.93,31.73 13.5,31.79 12.34,29.66 10.21,28.5 10.27,26.07 9,24 10.27,21.93 10.21,19.5 12.34,18.34 13.5,16.21 15.93,16.27 18,15 20.07,16.27 22.5,16.21 23.66,18.34 25.79,19.5 25.73,21.93' fill='%231a56ff'/%3E%3Cline x1='1' y1='0' x2='1' y2='48' stroke='%237a9fff' stroke-width='1' stroke-dasharray='8,4'/%3E%3C/svg%3E");
       }
 
       .card-page {
@@ -368,6 +369,7 @@
 
       .business-card {
         position: relative;
+        isolation: isolate; /* confines ::before blend mode to this element's own surface */
         width: min(90vw, 700px);
         aspect-ratio: 3.5 / 2;
         background-color: var(--color-bg);
@@ -459,17 +461,6 @@
         gap: 1rem;
       }
 
-      .swatches {
-        display: flex;
-        align-items: center;
-      }
-
-      .swatch {
-        width: clamp(20px, 2.5vw, 40px);
-        height: clamp(20px, 2.5vw, 40px);
-        flex-shrink: 0;
-      }
-
       .footer-brand {
         display: flex;
         flex-direction: column;
@@ -497,7 +488,6 @@
         letter-spacing: 0.05em;
       }
 
-
       .section-body {
         font-size: var(--body-text);
         line-height: 1.6;
@@ -513,6 +503,20 @@
           max-width: none;
         }
 
+        h1 {
+          font-size: clamp(2.5rem, 5dvh, 6rem);
+        }
+
+        .subtitle {
+          font-size: clamp(1.25rem, 2.5dvh, 3rem);
+        }
+
+        .hero-portrait {
+          height: auto;
+          max-height: min(max(60.5vw, 70vh), 858px);
+          max-width: 100vw;
+        }
+
         .card-meta-left,
         .card-meta-right {
           max-width: 48%;
@@ -525,9 +529,16 @@
   <body>
     <svg width="0" height="0" style="position:absolute">
       <defs>
+        <!-- region locked to element bounds; SVG filter default extends 10% beyond, causing halo bleed -->
         <filter id="paper-noise" x="0%" y="0%" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="6" stitchTiles="stitch" result="noise"/>
-          <feColorMatrix type="saturate" values="0" in="noise"/>
+          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="6" stitchTiles="stitch" result="noise"/>
+          <feColorMatrix type="saturate" values="0" in="noise" result="gray"/>
+          <!-- output = slope * input + intercept; pushes midtones to white so only dark specks survive multiply -->
+          <feComponentTransfer in="gray">
+            <feFuncR type="linear" slope="2.5" intercept="-0.7"/>
+            <feFuncG type="linear" slope="2.5" intercept="-0.7"/>
+            <feFuncB type="linear" slope="2.5" intercept="-0.7"/>
+          </feComponentTransfer>
         </filter>
       </defs>
     </svg>
@@ -542,8 +553,8 @@
       <div class="container">
         <div class="hero">
           <h1>Amadeus Kang</h1>
-          <p class="subtitle">is a software engineer based in</p>
-          <p class="subtitle">Washington DC.</p>
+          <p class="subtitle">is a designer & developer</p>
+          <p class="subtitle">based in Washington DC.</p>
         </div>
       </div>
       <img class="hero-portrait" src="half-portrait-solid.png" alt="">
@@ -576,7 +587,7 @@
       <p class="card-eyebrow">Here's my card.</p>
       <div class="business-card">
         <div class="card-name">Amadeus Kang</div>
-        <div class="card-role">Software Engineer</div>
+        <div class="card-role">Designer & Developer</div>
         <div class="card-meta">
           <div class="card-meta-left">
             <span>Washington DC</span>
@@ -596,13 +607,6 @@
           <span class="footer-name">Amadeus Kang</span>
           <div class="footer-bottom">
             <span class="copyright">© 2026–<span id="year"></span> Amadeus Kang</span>
-            <div class="swatches">
-              <div class="swatch" style="background:var(--blue-light)"></div>
-              <div class="swatch" style="background:var(--blue-pale)"></div>
-              <div class="swatch" style="background:var(--gray)"></div>
-              <div class="swatch" style="background:var(--black)"></div>
-              <div class="swatch" style="background:var(--white)"></div>
-            </div>
           </div>
         </div>
       </div>
@@ -617,6 +621,7 @@
       const lenis = new Lenis({ lerp: 0.2 });
       gsap.ticker.add((time) => { lenis.raf(time * 1000); });
       gsap.ticker.lagSmoothing(0);
+      // required on mobile: Lenis consumes touch events so ScrollTrigger never gets native scroll updates
       lenis.on('scroll', ScrollTrigger.update);
 
       document.querySelectorAll('nav a[href^="#"]').forEach(a => {
@@ -653,26 +658,37 @@
         ease: 'expo.out',
       }, 2.0);
 
-      const cardST = {
+      const card = document.querySelector('.business-card');
+      let cardReady = false;
+
+      // overwrite: true kills any active hover tweens before each enter/leave, preventing stuck state
+      ScrollTrigger.create({
         trigger: '.card-page',
         start: 'top 20%',
-        toggleActions: 'play none none reverse',
-      };
-      gsap.fromTo('.card-eyebrow',
-        { clipPath: 'inset(0 0 100% 0)', y: 20 },
-        { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 0.9, ease: 'expo.out', scrollTrigger: cardST }
-      );
-      gsap.fromTo('.business-card',
-        { y: '200vh', rotation: -722, opacity: 0 },
-        { y: 0, rotation: -2, opacity: 1, duration: 0.9, ease: 'expo.out', scrollTrigger: cardST }
-      );
-
-      const card = document.querySelector('.business-card');
+        onEnter: () => {
+          cardReady = false;
+          gsap.fromTo('.card-eyebrow',
+            { clipPath: 'inset(0 0 100% 0)', y: 20 },
+            { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 0.9, ease: 'expo.out', overwrite: true }
+          );
+          gsap.fromTo(card,
+            { y: '200vh', rotation: -722, opacity: 0 }, // -722 = two full spins (-720) + landing angle (-2)
+            { y: 0, rotation: -2, opacity: 1, duration: 0.9, ease: 'expo.out', overwrite: true, onComplete: () => { cardReady = true; } }
+          );
+        },
+        onLeaveBack: () => {
+          cardReady = false;
+          gsap.to('.card-eyebrow', { clipPath: 'inset(0 0 100% 0)', y: 20, duration: 0.6, ease: 'expo.in', overwrite: true });
+          gsap.to(card, { y: '200vh', rotation: -722, opacity: 0, duration: 0.9, ease: 'expo.in', overwrite: true });
+        },
+      });
       card.addEventListener('mouseenter', () => {
-        gsap.to(card, { rotation: 0, y: -8, duration: 0.15, ease: 'power3.out', overwrite: true });
+        if (!cardReady) return;
+        gsap.to(card, { rotation: 0, y: -8, duration: 0.15, ease: 'power3.out', overwrite: 'auto' });
       });
       card.addEventListener('mouseleave', () => {
-        gsap.to(card, { rotation: -2, y: 0, duration: 0.4, ease: 'power2.out', overwrite: true });
+        if (!cardReady) return;
+        gsap.to(card, { rotation: -2, y: 0, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
       });
 
       ['main', '.interstitial'].forEach(sel => {
@@ -687,11 +703,10 @@
         gsap.fromTo(sel,
           { clipPath: 'inset(0 0 100% 0)', y: 60 },
           { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.4, ease: 'expo.out', delay: i * 0.15,
-            scrollTrigger: { trigger: '.footer-brand', start: 'top bottom', toggleActions: 'play none none reverse' }
+            scrollTrigger: { trigger: '.footer-brand', start: 'top bottom', toggleActions: 'play none none reverse' } // "top bottom" fires on enter; percentage-based starts can be unreachable on short mobile viewports
           }
         );
       });
-
 
       gsap.to('.hero-skyline', {
         y: '-12%',
