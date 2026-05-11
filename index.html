@@ -586,12 +586,17 @@
     <script>
       gsap.registerPlugin(ScrollTrigger);
 
-      // Drive Lenis from GSAP's ticker so ScrollTrigger reads the correct scroll position
-      const lenis = new Lenis({ lerp: 0.2 });
-      gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+      // Lenis smooth scroll is desktop-only; interpolation adds latency that feels laggy on touch devices
+      const isTouch = navigator.maxTouchPoints > 0;
+      let lenis;
+
+      if (!isTouch) {
+        lenis = new Lenis({ lerp: 0.2 });
+        gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+        lenis.on('scroll', ScrollTrigger.update);
+      }
+
       gsap.ticker.lagSmoothing(0);
-      // required on mobile: Lenis consumes touch events so ScrollTrigger never gets native scroll updates
-      lenis.on('scroll', ScrollTrigger.update);
 
       document.querySelectorAll('nav a[href^="#"]').forEach(a => {
         a.addEventListener('click', e => {
@@ -599,7 +604,11 @@
           const target = a.getAttribute('href') === '#contact'
             ? document.querySelector('.card-eyebrow')
             : document.querySelector(a.getAttribute('href'));
-          lenis.scrollTo(target, { offset: -60 });
+          if (lenis) {
+            lenis.scrollTo(target, { offset: -60 });
+          } else {
+            target.scrollIntoView({ behavior: 'smooth' });
+          }
         });
       });
 
