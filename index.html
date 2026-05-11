@@ -295,20 +295,6 @@
           0 6px 8px rgba(0, 5, 20, 0.20);
       }
 
-      main::after,
-      .business-card::before,
-      .noise-overlay {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: white;
-        filter: url(#paper-noise);
-        mix-blend-mode: multiply;
-        opacity: 0.2;
-        pointer-events: none;
-        z-index: 10;
-      }
-
       .interstitial {
         background-color: var(--color-bg);
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='60'%3E%3Ccircle cx='0' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='36' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='36' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='44' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='44' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='52' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='52' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='56' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='56' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='56' r='1' fill='%23d6e0ff'/%3E%3C/svg%3E");
@@ -369,7 +355,6 @@
 
       .business-card {
         position: relative;
-        isolation: isolate; /* confines ::before blend mode to this element's own surface */
         width: min(90vw, 700px);
         aspect-ratio: 3.5 / 2;
         background-color: var(--color-bg);
@@ -527,21 +512,6 @@
     </style>
   </head>
   <body>
-    <svg width="0" height="0" style="position:absolute">
-      <defs>
-        <!-- region locked to element bounds; SVG filter default extends 10% beyond, causing halo bleed -->
-        <filter id="paper-noise" x="0%" y="0%" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="6" stitchTiles="stitch" result="noise"/>
-          <feColorMatrix type="saturate" values="0" in="noise" result="gray"/>
-          <!-- output = slope * input + intercept; pushes midtones to white so only dark specks survive multiply -->
-          <feComponentTransfer in="gray">
-            <feFuncR type="linear" slope="2.5" intercept="-0.7"/>
-            <feFuncG type="linear" slope="2.5" intercept="-0.7"/>
-            <feFuncB type="linear" slope="2.5" intercept="-0.7"/>
-          </feComponentTransfer>
-        </filter>
-      </defs>
-    </svg>
     <main>
       <nav>
         <a href="#section-1">design</a>
@@ -560,7 +530,6 @@
       <img class="hero-portrait" src="half-portrait-solid.png" alt="">
     </main>
     <div class="interstitial">
-      <div class="noise-overlay"></div>
       <div class="container">
         <section id="section-1" class="section" data-index="01">
           <h2>Design</h2>
