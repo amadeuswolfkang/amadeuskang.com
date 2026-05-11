@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amadeus Kang</title>
+
+    <style>
+      html {
+        overflow-x: hidden;
+        scrollbar-gutter: stable;
+        overscroll-behavior: none;
+      }
+
+      @font-face {
+        font-family: "BDO Grotesk";
+        src: url("fonts/BDOGrotesk/BDOGrotesk-Bold.woff2") format("woff2");
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "BDO Grotesk";
+        src: url("fonts/BDOGrotesk/BDOGrotesk-Regular.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "Archivo";
+        src: url("fonts/Archivo/static/Archivo-Regular.ttf") format("truetype");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "Archivo";
+        src: url("fonts/Archivo/static/Archivo-Bold.ttf") format("truetype");
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "Nyght Serif";
+        src: url("fonts/NyghtSerif/NyghtSerif-Medium.woff2") format("woff2"),
+             url("fonts/NyghtSerif/NyghtSerif-Medium.woff") format("woff");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "Nyght Serif";
+        src: url("fonts/NyghtSerif/NyghtSerif-Bold.woff2") format("woff2"),
+             url("fonts/NyghtSerif/NyghtSerif-Bold.woff") format("woff");
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "Nyght Serif";
+        src: url("fonts/NyghtSerif/NyghtSerif-Dark.woff2") format("woff2"),
+             url("fonts/NyghtSerif/NyghtSerif-Dark.woff") format("woff");
+        font-weight: 900;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        /* Primitives */
+        --blue: #1a56ff;
+        --blue-light: #7a9fff;
+        --blue-pale: #d6e0ff;
+        --gray: #888888;
+        --black: #28282b;
+        --white: #ffffff;
+
+        /* Layout */
+        --content-width: 90%;
+        --section-gap: clamp(3rem, 5vw, 6rem);
+        --section-pad: clamp(1.25rem, 3vw, 3rem);
+        --body-text: clamp(18px, 1.8vw, 24px);
+        --font-ui: "BDO Grotesk", sans-serif;
+
+        /* Semantic tokens */
+        --color-bg: #fefefe;
+        --color-fg: var(--black);
+        --color-accent: var(--blue);
+        --color-fg-muted: var(--gray);
+        --color-fg-subtle: var(--blue-light);
+        --color-bg-subtle: var(--blue-pale);
+        --color-bg-inverse: var(--blue);
+        --color-fg-inverse: var(--white);
+      }
+
+      body {
+        font-family: var(--font-ui);
+        color: var(--color-fg);
+        background-color: var(--color-bg-inverse);
+        background-image:
+          linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px);
+        background-size: 40px 40px;
+        min-height: 100vh;
+      }
+
+      .container,
+      nav {
+        width: var(--content-width);
+        margin: 0 auto;
+      }
+
+      .container {
+        padding-bottom: 5rem;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: center;
+        gap: clamp(1rem, 2vw, 2rem);
+        padding: 1rem clamp(1.5rem, 5vw, 6rem);
+        position: relative;
+      }
+
+      /* initial hidden states: prevents flash before GSAP runs */
+      h1,
+      .subtitle {
+        clip-path: inset(120% 0 -0.2em 0);
+      }
+
+      .nav-line {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--color-accent);
+        transform-origin: left;
+        transform: scaleX(0);
+      }
+
+      nav a {
+        clip-path: inset(0 100% 0 0);
+        font-size: clamp(0.875rem, 1.5vw, 1.25rem);
+        text-decoration: none;
+        color: var(--color-fg);
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        position: relative;
+      }
+
+      nav a::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--color-accent);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.2s cubic-bezier(0.85, 0, 0.15, 1);
+      }
+
+      nav a:hover::after {
+        transform: scaleX(1);
+      }
+
+      .hero {
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: clamp(2rem, 4vw, 4rem) 0 clamp(3rem, 6vw, 6rem);
+        margin-bottom: clamp(2rem, 4vw, 4rem);
+        max-width: 55vw;
+      }
+
+      .hero-skyline {
+        position: absolute;
+        bottom: 5%;
+        left: 0;
+        width: 100vw;
+        height: auto;
+        pointer-events: none;
+        opacity: 0;
+        animation: skylineFadeIn 2s ease 3.5s forwards;
+      }
+
+      @keyframes skylineFadeIn {
+        to { opacity: 0.45; }
+      }
+
+
+      .hero-portrait {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        height: min(60.5vw, 85vh, 858px);
+        width: auto;
+        clip-path: inset(0 0 100% 0);
+        filter: drop-shadow(0px 6px 8px rgba(0, 5, 20, 0.20));
+        animation: portraitWipeUp 1.0s cubic-bezier(0.16, 1, 0.3, 1) 2.5s forwards;
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      .hero-portrait:hover {
+        transform: translate(6px, -8px) rotate(1deg);
+        filter: drop-shadow(-6px 14px 12px rgba(0, 5, 20, 0.28));
+      }
+
+      @keyframes portraitWipeUp {
+        to { clip-path: inset(0 0 0% 0); }
+      }
+
+      h1 {
+        font-family: "Nyght Serif", serif;
+        font-weight: 900;
+        font-size: clamp(2.5rem, 7vw, 6rem);
+        line-height: 1.05;
+        color: var(--color-accent);
+        letter-spacing: -0.02em;
+        -webkit-text-stroke: 4px var(--color-bg);
+        paint-order: stroke fill;
+      }
+
+      .section {
+        width: 65%;
+        margin: 0 auto var(--section-gap);
+        padding: var(--section-pad);
+        border: 2px solid var(--color-accent);
+        position: relative;
+        background-color: var(--color-bg);
+        padding-bottom: calc(var(--section-pad) + 3.5rem);
+        transition: box-shadow 0.2s;
+      }
+
+      .section:hover {
+        box-shadow: 8px 8px 0 0 var(--color-accent);
+      }
+
+      .section h2 {
+        font-family: "Archivo", sans-serif;
+        font-weight: 400;
+        font-size: calc(clamp(1.25rem, 3vw, 2.25rem) + 6px);
+        color: var(--color-accent);
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        position: absolute;
+        top: 0;
+        left: var(--section-pad);
+        transform: translateY(-50%);
+        padding: 0 0.4rem;
+        background-color: var(--color-bg);
+      }
+
+      .section::after {
+        content: attr(data-index);
+        position: absolute;
+        top: 0.5rem;
+        right: 0.75rem;
+        font-family: "Archivo", sans-serif;
+        font-size: clamp(1.5rem, 3vw, 3rem);
+        font-weight: 400;
+        color: var(--color-bg-subtle);
+        line-height: 1;
+        letter-spacing: 0.02em;
+      }
+
+      .subtitle {
+        font-family: "Nyght Serif", serif;
+        font-weight: 700;
+        font-size: clamp(1.25rem, 3vw, 3rem);
+        color: var(--color-accent);
+        margin-top: 0.5rem;
+        -webkit-text-stroke: 4px var(--color-bg);
+        paint-order: stroke fill;
+      }
+
+      .subtitle + .subtitle {
+        margin-top: 0;
+      }
+
+      main {
+        background-color: var(--color-bg);
+        transform-origin: center top;
+        height: 100vh;
+        height: 100dvh;
+        overflow: clip;
+        position: relative;
+        box-shadow:
+          0 6px 8px rgba(0, 5, 20, 0.20);
+      }
+
+      main::after,
+      .business-card::before,
+      .noise-overlay {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: white;
+        filter: url(#paper-noise);
+        mix-blend-mode: multiply;
+        opacity: 0.3;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      .interstitial {
+        background-color: var(--color-bg);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='60'%3E%3Ccircle cx='0' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='36' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='36' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='44' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='44' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='52' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='52' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='56' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='56' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='56' r='1' fill='%23d6e0ff'/%3E%3C/svg%3E");
+        background-size: 8px 60px;
+        background-repeat: repeat;
+        width: 95%;
+        margin: 4rem auto 0;
+        padding: 3rem 0;
+        transform-origin: center top;
+        overflow-x: clip;
+        box-shadow:
+          0 6px 8px rgba(0, 5, 20, 0.20);
+        position: relative;
+      }
+
+      .interstitial::before,
+      .interstitial::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 36px;
+        background-color: var(--color-bg);
+        background-repeat: repeat-y;
+        background-size: 36px 48px;
+      }
+
+      .interstitial::before {
+        left: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='48'%3E%3Cpolygon points='27,24 25.73,26.07 25.79,28.5 23.66,29.66 22.5,31.79 20.07,31.73 18,33 15.93,31.73 13.5,31.79 12.34,29.66 10.21,28.5 10.27,26.07 9,24 10.27,21.93 10.21,19.5 12.34,18.34 13.5,16.21 15.93,16.27 18,15 20.07,16.27 22.5,16.21 23.66,18.34 25.79,19.5 25.73,21.93' fill='%231a56ff'/%3E%3Cline x1='35' y1='0' x2='35' y2='48' stroke='%23888888' stroke-width='1' stroke-dasharray='4,4'/%3E%3C/svg%3E");
+      }
+
+      .interstitial::after {
+        right: 0;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='48'%3E%3Cpolygon points='27,24 25.73,26.07 25.79,28.5 23.66,29.66 22.5,31.79 20.07,31.73 18,33 15.93,31.73 13.5,31.79 12.34,29.66 10.21,28.5 10.27,26.07 9,24 10.27,21.93 10.21,19.5 12.34,18.34 13.5,16.21 15.93,16.27 18,15 20.07,16.27 22.5,16.21 23.66,18.34 25.79,19.5 25.73,21.93' fill='%231a56ff'/%3E%3Cline x1='1' y1='0' x2='1' y2='48' stroke='%23888888' stroke-width='1' stroke-dasharray='4,4'/%3E%3C/svg%3E");
+      }
+
+      .card-page {
+        min-height: 100vh;
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(2.5rem, 5vw, 5rem);
+        padding: 3rem 0;
+        overflow: clip;
+      }
+
+      .card-eyebrow {
+        font-family: "Nyght Serif", serif;
+        font-weight: 400;
+        font-size: clamp(3rem, 8vw, 8rem);
+        color: var(--color-fg-inverse);
+        clip-path: inset(0 0 100% 0);
+        text-align: center;
+      }
+
+      .business-card {
+        position: relative;
+        width: min(90vw, 700px);
+        aspect-ratio: 3.5 / 2;
+        background-color: var(--color-bg);
+        padding: clamp(1rem, 2.5vw, 2rem);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow:
+          0 6px 8px rgba(0, 5, 20, 0.20);
+      }
+
+      .card-name {
+        font-family: "Nyght Serif", serif;
+        font-weight: 900;
+        font-size: clamp(1.1rem, 3.5vw, 2.6rem);
+        color: var(--color-accent);
+        letter-spacing: -0.02em;
+      }
+
+      .card-role {
+        font-family: "Nyght Serif", serif;
+        font-size: clamp(0.95rem, 2.2vw, 1.5rem);
+        color: var(--color-accent);
+      }
+
+      .card-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        font-size: clamp(0.75rem, 1.8vw, 1.2rem);
+        color: var(--color-accent);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .card-meta-left,
+      .card-meta-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+
+      .card-meta-right {
+        align-items: flex-end;
+      }
+
+      .card-meta a {
+        color: inherit;
+        text-decoration: none;
+        position: relative;
+      }
+
+      .card-meta a::after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: var(--color-accent);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.2s cubic-bezier(0.85, 0, 0.15, 1);
+      }
+
+      .card-meta a:hover::after {
+        transform: scaleX(1);
+      }
+
+      footer {
+        width: 100%;
+        padding: clamp(4rem, 8vw, 15rem) 0 0;
+        position: relative;
+      }
+
+      .footer-inner {
+        width: var(--content-width);
+        margin: 0 auto;
+        padding: 0 0 1rem;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .footer-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .swatches {
+        display: flex;
+        align-items: center;
+      }
+
+      .swatch {
+        width: clamp(20px, 2.5vw, 40px);
+        height: clamp(20px, 2.5vw, 40px);
+        flex-shrink: 0;
+      }
+
+      .footer-brand {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .footer-name {
+        font-family: "Archivo", sans-serif;
+        font-weight: 700;
+        font-size: clamp(2rem, 10vw, 100rem);
+        color: var(--color-fg-inverse);
+        text-transform: uppercase;
+        white-space: nowrap;
+        line-height: 1;
+        display: block;
+        text-align: center;
+      }
+
+      .copyright {
+        font-style: normal;
+        font-weight: 400;
+        font-size: clamp(0.75rem, 1.2vw, 1rem);
+        color: var(--color-fg-subtle);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+
+      .section-body {
+        font-size: var(--body-text);
+        line-height: 1.6;
+        max-width: 55ch;
+      }
+
+      @media (max-width: 640px) {
+        :root {
+          --content-width: 96%;
+        }
+
+        .hero {
+          max-width: none;
+        }
+
+        .card-meta-left,
+        .card-meta-right {
+          max-width: 48%;
+          overflow-wrap: break-word;
+        }
+      }
+
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <filter id="paper-noise" x="0%" y="0%" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="6" stitchTiles="stitch" result="noise"/>
+          <feColorMatrix type="saturate" values="0" in="noise"/>
+        </filter>
+      </defs>
+    </svg>
+    <main>
+      <nav>
+        <a href="#section-1">design</a>
+        <a href="#section-2">writing</a>
+        <a href="#contact">contact</a>
+        <div class="nav-line"></div>
+      </nav>
+      <img class="hero-skyline" src="dc-skyline.png" alt="">
+      <div class="container">
+        <div class="hero">
+          <h1>Amadeus Kang</h1>
+          <p class="subtitle">is a software engineer based in</p>
+          <p class="subtitle">Washington DC.</p>
+        </div>
+      </div>
+      <img class="hero-portrait" src="half-portrait-solid.png" alt="">
+    </main>
+    <div class="interstitial">
+      <div class="noise-overlay"></div>
+      <div class="container">
+        <section id="section-1" class="section" data-index="01">
+          <h2>Design</h2>
+          <p class="section-body">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.
+          </p>
+        </section>
+
+        <section id="section-2" class="section" data-index="02">
+          <h2>Writing</h2>
+          <p class="section-body">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.
+          </p>
+        </section>
+      </div>
+    </div>
+    <section class="card-page" id="contact">
+      <p class="card-eyebrow">Here's my card.</p>
+      <div class="business-card">
+        <div class="card-name">Amadeus Kang</div>
+        <div class="card-role">Software Engineer</div>
+        <div class="card-meta">
+          <div class="card-meta-left">
+            <span>Washington DC</span>
+            <a href="https://amadeuskang.com">amadeuskang.com</a>
+          </div>
+          <div class="card-meta-right">
+            <a href="mailto:amadeuskang@gmail.com">amadeuskang@gmail.com</a>
+            <a href="https://linkedin.com/in/amadeuskang" target="_blank" rel="noopener">linkedin.com/in/amadeuskang</a>
+            <a href="https://github.com/amadeuswolfkang" target="_blank" rel="noopener">github.com/amadeuswolfkang</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer>
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <span class="footer-name">Amadeus Kang</span>
+          <div class="footer-bottom">
+            <span class="copyright">© 2026–<span id="year"></span> Amadeus Kang</span>
+            <div class="swatches">
+              <div class="swatch" style="background:var(--blue-light)"></div>
+              <div class="swatch" style="background:var(--blue-pale)"></div>
+              <div class="swatch" style="background:var(--gray)"></div>
+              <div class="swatch" style="background:var(--black)"></div>
+              <div class="swatch" style="background:var(--white)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="gsap-public/minified/gsap.min.js"></script>
+    <script src="gsap-public/minified/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+    <script>
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Drive Lenis from GSAP's ticker so ScrollTrigger reads the correct scroll position
+      const lenis = new Lenis({ lerp: 0.2 });
+      gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+      gsap.ticker.lagSmoothing(0);
+      lenis.on('scroll', ScrollTrigger.update);
+
+      document.querySelectorAll('nav a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+          e.preventDefault();
+          const target = a.getAttribute('href') === '#contact'
+            ? document.querySelector('.card-eyebrow')
+            : document.querySelector(a.getAttribute('href'));
+          lenis.scrollTo(target, { offset: -60 });
+        });
+      });
+
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      const subtitles = gsap.utils.toArray('.subtitle');
+      gsap.set(['h1', ...subtitles], { y: 20 });
+
+      const tl = gsap.timeline();
+
+      tl.to('h1', { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 0.5)
+        .to('h1', { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 0.5);
+
+      tl.to(subtitles[0], { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 1.0)
+        .to(subtitles[0], { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 1.0);
+
+      tl.to(subtitles[1], { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 1.5)
+        .to(subtitles[1], { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 1.5);
+
+      tl.to('.nav-line', { scaleX: 1, duration: 0.5, ease: 'expo.out' }, 2.0);
+
+      tl.to('nav a', {
+        clipPath: 'inset(0 0% 0 0)',
+        duration: 0.5,
+        ease: 'expo.out',
+      }, 2.0);
+
+      const cardST = {
+        trigger: '.card-page',
+        start: 'top 20%',
+        toggleActions: 'play none none reverse',
+      };
+      gsap.fromTo('.card-eyebrow',
+        { clipPath: 'inset(0 0 100% 0)', y: 20 },
+        { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 0.9, ease: 'expo.out', scrollTrigger: cardST }
+      );
+      gsap.fromTo('.business-card',
+        { y: '200vh', rotation: -722, opacity: 0 },
+        { y: 0, rotation: -2, opacity: 1, duration: 0.9, ease: 'expo.out', scrollTrigger: cardST }
+      );
+
+      const card = document.querySelector('.business-card');
+      card.addEventListener('mouseenter', () => {
+        gsap.to(card, { rotation: 0, y: -8, duration: 0.15, ease: 'power3.out' });
+      });
+      card.addEventListener('mouseleave', () => {
+        gsap.to(card, { rotation: -2, y: 0, duration: 0.4, ease: 'power2.out' });
+      });
+
+      ['main', '.interstitial'].forEach(sel => {
+        gsap.to(sel, {
+          scale: 0.78,
+          ease: 'none',
+          scrollTrigger: { trigger: sel, start: 'center top', end: 'bottom top', scrub: true },
+        });
+      });
+
+      ['.footer-name', '.footer-bottom'].forEach((sel, i) => {
+        gsap.fromTo(sel,
+          { clipPath: 'inset(0 0 100% 0)', y: 60 },
+          { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.4, ease: 'expo.out', delay: i * 0.15,
+            scrollTrigger: { trigger: '.footer-brand', start: 'top bottom', toggleActions: 'play none none reverse' }
+          }
+        );
+      });
+
+
+      gsap.to('.hero-skyline', {
+        y: '-12%',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: 'main',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+        }
+      });
+
+    </script>
+  </body>
+</html>
