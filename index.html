@@ -638,6 +638,7 @@
 
       const card = document.querySelector('.business-card');
       let cardReady = false;
+      gsap.set(card, { y: '200vh', rotation: -722, opacity: 0 });
 
       // overwrite: true kills any active hover tweens before each enter/leave, preventing stuck state
       ScrollTrigger.create({
