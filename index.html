@@ -684,10 +684,10 @@
 
       const card = document.querySelector('.business-card');
       card.addEventListener('mouseenter', () => {
-        gsap.to(card, { rotation: 0, y: -8, duration: 0.15, ease: 'power3.out' });
+        gsap.to(card, { rotation: 0, y: -8, duration: 0.15, ease: 'power3.out', overwrite: true });
       });
       card.addEventListener('mouseleave', () => {
-        gsap.to(card, { rotation: -2, y: 0, duration: 0.4, ease: 'power2.out' });
+        gsap.to(card, { rotation: -2, y: 0, duration: 0.4, ease: 'power2.out', overwrite: true });
       });
 
       ['main', '.interstitial'].forEach(sel => {
