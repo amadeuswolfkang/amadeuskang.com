@@ -516,11 +516,17 @@
           font-size: clamp(1.25rem, 2.5svh, 3rem);
         }
 
+        .hero-skyline {
+          left: -20vw;
+          width: 330vw;
+          transform: none;
+        }
+
         .hero-portrait {
           position: relative;
           display: block;
           height: auto;
-          margin: clamp(0.75rem, 3svh, 1.5rem) 0 0 auto;
+          margin: clamp(0.75rem, 3svh, 1.5rem) -15vw 0 auto;
           max-height: min(56svh, 858px);
           max-width: 100vw;
         }
@@ -706,7 +712,7 @@
         // Prevent overlapping hover and entrance tweens.
         ScrollTrigger.create({
           trigger: '.contact-section',
-          start: 'top 20%',
+          start: 'top 80%',
           onEnter: () => {
             cardReady = false;
             gsap.fromTo('.card-eyebrow',
@@ -733,16 +739,6 @@
           });
         });
 
-        gsap.to('.hero-skyline', {
-          y: '-12%',
-          ease: 'none',
-          scrollTrigger: {
-            trigger: 'main',
-            start: 'top top',
-            end: 'bottom top',
-            scrub: true,
-          }
-        });
       }
 
       card.addEventListener('mouseenter', () => {
