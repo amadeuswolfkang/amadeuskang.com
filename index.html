@@ -193,7 +193,7 @@
         position: absolute;
         bottom: 0;
         right: 0;
-        height: min(max(60.5vw, 70vh), 858px, 92svh);
+        height: min(max(52vw, 60svh), 858px, 92svh);
         width: auto;
         transform-origin: right bottom;
         clip-path: inset(0 0 100% 0);
@@ -487,9 +487,10 @@
         letter-spacing: 0.05em;
       }
 
-      @media (max-width: 640px) {
+      /* Hero image composition needs separate art direction for portrait viewports. */
+      @media (max-width: 1024px) and (orientation: portrait) {
         :root {
-          --content-width: calc(100% - 3rem);
+          --content-width: calc(100% - clamp(3rem, 8vw, 4rem));
         }
 
         main {
@@ -517,8 +518,8 @@
         }
 
         .hero-skyline {
-          left: -20vw;
-          width: 330vw;
+          left: -10vw;
+          width: clamp(130vw, calc(20rem + 96vw), 260vw);
           transform: none;
         }
 
@@ -526,9 +527,15 @@
           position: relative;
           display: block;
           height: auto;
-          margin: clamp(0.75rem, 3svh, 1.5rem) -15vw 0 auto;
-          max-height: min(56svh, 858px);
+          margin: clamp(0.75rem, 3svh, 1.5rem) 0 0 auto;
+          transform: translateX(20vw);
+          max-height: min(60svh, 760px);
           max-width: 100vw;
+          transition: none;
+        }
+
+        .hero-portrait:hover {
+          transform: translateX(20vw);
         }
 
         .card-links {
@@ -573,10 +580,6 @@
         .hero-portrait {
           animation: none;
           transition: none;
-        }
-
-        .hero-portrait:hover {
-          transform: none;
         }
       }
 
