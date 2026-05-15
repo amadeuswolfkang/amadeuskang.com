@@ -8,6 +8,8 @@
     <link rel="preload" as="image" href="img/half-portrait-solid.avif" fetchpriority="high">
     <link rel="preload" as="font" type="font/woff2" href="fonts/NyghtSerif/NyghtSerif-Dark.woff2" crossorigin>
     <link rel="preload" as="font" type="font/woff2" href="fonts/NyghtSerif/NyghtSerif-Bold.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="fonts/NyghtSerif/NyghtSerif-BoldItalic.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="fonts/Archivo/Archivo_Expanded-Regular.woff2" crossorigin>
     <script>
       document.documentElement.classList.add('js');
     </script>
@@ -23,8 +25,32 @@
 
       @font-face {
         font-family: "Archivo";
-        src: url("fonts/Archivo/Archivo-VariableFont_wdth,wght.woff2") format("woff2");
-        font-weight: 100 900;
+        src: url("fonts/Archivo/Archivo-Regular.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "Archivo";
+        src: url("fonts/Archivo/Archivo-Bold.woff2") format("woff2");
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "Archivo Expanded";
+        src: url("fonts/Archivo/Archivo_Expanded-Regular.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "Archivo Expanded";
+        src: url("fonts/Archivo/Archivo_Expanded-Bold.woff2") format("woff2");
+        font-weight: 700;
         font-style: normal;
         font-display: swap;
       }
@@ -39,9 +65,25 @@
 
       @font-face {
         font-family: "Nyght Serif";
+        src: url("fonts/NyghtSerif/NyghtSerif-MediumItalic.woff2") format("woff2");
+        font-weight: 400;
+        font-style: italic;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "Nyght Serif";
         src: url("fonts/NyghtSerif/NyghtSerif-Bold.woff2") format("woff2");
         font-weight: 700;
         font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "Nyght Serif";
+        src: url("fonts/NyghtSerif/NyghtSerif-BoldItalic.woff2") format("woff2");
+        font-weight: 700;
+        font-style: italic;
         font-display: swap;
       }
 
@@ -139,9 +181,10 @@
       }
 
       nav a {
+        font-family: "Archivo Expanded", "Archivo", sans-serif;
         font-size: clamp(0.875rem, 1.5vw, 1.25rem);
         text-decoration: none;
-        color: var(--color-fg);
+        color: var(--color-accent);
         letter-spacing: 0.02em;
         text-transform: uppercase;
         position: relative;
@@ -257,7 +300,7 @@
       }
 
       .section h2 {
-        font-family: "Archivo", sans-serif;
+        font-family: "Archivo Expanded", "Archivo", sans-serif;
         font-weight: 400;
         font-size: calc(clamp(1.25rem, 3vw, 2.25rem) + 6px);
         color: var(--color-accent);
@@ -276,9 +319,9 @@
         position: absolute;
         top: 0.5rem;
         right: 0.75rem;
-        font-family: "Archivo", sans-serif;
+        font-family: "Archivo Expanded", "Archivo", sans-serif;
         font-size: clamp(1.5rem, 3vw, 3rem);
-        font-weight: 400;
+        font-weight: 700;
         color: var(--color-bg-subtle);
         line-height: 1;
         letter-spacing: 0.02em;
@@ -388,7 +431,7 @@
       .card-name {
         font-family: "Nyght Serif", serif;
         font-weight: 900;
-        font-size: clamp(1.1rem, 3.5vw, 2.6rem);
+        font-size: clamp(1.4rem, 4.5vw, 3.25rem);
         color: var(--color-accent);
         letter-spacing: -0.02em;
       }
@@ -399,10 +442,15 @@
         color: var(--color-accent);
       }
 
+      .amp {
+        font-style: italic;
+      }
+
       .card-meta {
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
+        font-family: "Archivo Expanded", "Archivo", sans-serif;
         font-size: clamp(0.8rem, 2vw, 1.35rem);
         color: var(--color-accent);
         letter-spacing: 0.04em;
@@ -427,18 +475,19 @@
       .card-meta a::after {
         content: "";
         position: absolute;
-        bottom: -1px;
+        bottom: 0;
         left: 0;
         width: 100%;
-        height: 1px;
+        height: 2px;
         background: var(--color-accent);
-        transform: scaleX(0);
+        transform: scaleX(0) translateZ(0);
         transform-origin: left;
         transition: transform 0.2s cubic-bezier(0.85, 0, 0.15, 1);
+        will-change: transform;
       }
 
       .card-meta a:hover::after {
-        transform: scaleX(1);
+        transform: scaleX(1) translateZ(0);
       }
 
       footer {
@@ -457,9 +506,10 @@
 
       .footer-bottom {
         display: flex;
-        align-items: center;
+        align-items: baseline;
         justify-content: space-between;
         gap: 1rem;
+        flex-wrap: wrap;
       }
 
       .footer-brand {
@@ -472,9 +522,9 @@
       }
 
       .footer-name {
-        font-family: "Archivo", sans-serif;
+        font-family: "Archivo Expanded", "Archivo", sans-serif;
         font-weight: 700;
-        font-size: clamp(2rem, 10vw, 100rem);
+        font-size: clamp(1.5rem, 6vw, 10rem);
         color: var(--color-fg-inverse);
         text-transform: uppercase;
         white-space: nowrap;
@@ -490,6 +540,25 @@
         color: var(--color-bg-subtle);
         text-transform: uppercase;
         letter-spacing: 0.05em;
+      }
+
+      .colophon {
+        font-weight: 400;
+        font-size: clamp(0.75rem, 1.2vw, 1rem);
+        color: var(--color-bg-subtle);
+        letter-spacing: 0.02em;
+      }
+
+      .colophon a {
+        color: inherit;
+        text-underline-offset: 0.1em;
+        text-decoration-thickness: 2px;
+        text-decoration-color: currentColor;
+        transition: color 0.2s ease;
+      }
+
+      .colophon a:hover {
+        color: var(--color-fg-subtle);
       }
 
       /* Hero image composition needs separate art direction for portrait viewports. */
@@ -629,7 +698,7 @@
       <div class="container">
         <div class="hero">
           <h1>Amadeus Kang</h1>
-          <p class="subtitle">is a designer &amp; developer</p>
+          <p class="subtitle">is a designer <span class="amp">&amp;</span> developer</p>
           <p class="subtitle">based in Washington DC.</p>
         </div>
       </div>
@@ -640,7 +709,7 @@
         <section id="design" class="section" data-index="01">
           <h2>Design</h2>
           <p class="section-body">
-            Selected design work coming soon. anfdeuwhf weufwehefiwehfwhiehfweiu
+            Selected design work coming soon.
           </p>
         </section>
 
@@ -656,7 +725,7 @@
       <p class="card-eyebrow">Here's my card.</p>
       <div class="business-card">
         <div class="card-name">Amadeus Kang</div>
-        <div class="card-role">Designer &amp; Developer</div>
+        <div class="card-role">Designer <span class="amp">&amp;</span> Developer</div>
         <div class="card-meta">
           <div class="card-links">
             <a href="mailto:amadeuskang@gmail.com">amadeuskang@gmail.com</a>
@@ -669,9 +738,10 @@
     <footer>
       <div class="footer-inner">
         <div class="footer-brand">
-          <span class="footer-name">Amadeus Kang</span>
+          <span class="footer-name">Available for work</span>
           <div class="footer-bottom">
             <span class="copyright">© 2026–<span id="year"></span> Amadeus Kang</span>
+            <span class="colophon">Set in <a href="https://www.tunera.xyz/fonts/nyght-serif/" target="_blank" rel="noopener">Nyght Serif</a> by Maksym Kobuzan and <a href="https://github.com/Omnibus-Type/Archivo" target="_blank" rel="noopener">Archivo</a> by Héctor Gatti.</span>
           </div>
         </div>
       </div>
