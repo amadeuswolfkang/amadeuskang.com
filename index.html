@@ -105,10 +105,6 @@
         margin: 0 auto;
       }
 
-      .container {
-        padding-bottom: 5rem;
-      }
-
       nav {
         display: flex;
         flex-wrap: wrap;
@@ -305,7 +301,6 @@
 
       main > .container {
         height: 100%;
-        padding-bottom: 0;
       }
 
       main .hero {
@@ -325,6 +320,10 @@
         box-shadow:
           0 6px 8px rgba(0, 5, 20, 0.2);
         position: relative;
+      }
+
+      .work-section .container {
+        padding-bottom: 5rem;
       }
 
       .work-section::before,
@@ -350,14 +349,12 @@
       }
 
       .contact-section {
-        min-height: 100vh;
-        min-height: 100svh;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         gap: clamp(2.5rem, 5vw, 5rem);
-        padding: 3rem 0;
+        padding: clamp(3rem, 8svh, 5rem) 0;
         overflow: clip;
       }
 
@@ -463,6 +460,9 @@
       .footer-brand {
         display: flex;
         flex-direction: column;
+        width: max-content;
+        max-width: 100%;
+        margin: 0 auto;
         gap: 0.25rem;
       }
 
@@ -475,7 +475,7 @@
         white-space: nowrap;
         line-height: 1;
         display: block;
-        text-align: center;
+        text-align: left;
       }
 
       .copyright {
@@ -489,7 +489,7 @@
 
       @media (max-width: 640px) {
         :root {
-          --content-width: 96%;
+          --content-width: calc(100% - 3rem);
         }
 
         main {
@@ -528,6 +528,19 @@
         .card-links {
           max-width: 100%;
           overflow-wrap: break-word;
+        }
+
+        .work-section .section:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      @media (min-width: 641px) {
+        .contact-section {
+          min-height: 100vh;
+          min-height: 100svh;
+          justify-content: center;
+          padding: 3rem 0;
         }
       }
 
