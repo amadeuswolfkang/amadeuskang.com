@@ -74,8 +74,8 @@
         /* Layout */
         --content-width: 90%;
         --section-gap: clamp(3rem, 5vw, 6rem);
-        --section-pad: clamp(1.25rem, 3vw, 3rem);
-        --body-text: clamp(18px, 1.8vw, 24px);
+        --section-padding: clamp(1.25rem, 3vw, 3rem);
+        --body-font-size: clamp(18px, 1.8vw, 24px);
         --font-ui: "Archivo", sans-serif;
 
         /* Semantic tokens */
@@ -119,7 +119,7 @@
         position: relative;
       }
 
-      /* hidden before GSAP runs; -0.2em bottom gives descenders room during the wipe-up reveal */
+      /* Initial GSAP reveal state; bottom inset preserves descenders. */
       .js h1,
       .js .subtitle {
         clip-path: inset(120% 0 -0.2em 0);
@@ -222,7 +222,6 @@
         line-height: 1.05;
         color: var(--color-accent);
         letter-spacing: -0.02em;
-        /* stroke painted beneath fill so it doesn't erode letter shapes */
         -webkit-text-stroke: 4px var(--color-bg);
         paint-order: stroke fill;
       }
@@ -233,7 +232,6 @@
         font-size: clamp(1.25rem, 3vw, 3rem);
         color: var(--color-accent);
         margin-top: 0.5rem;
-        /* stroke painted beneath fill so it doesn't erode letter shapes */
         -webkit-text-stroke: 4px var(--color-bg);
         paint-order: stroke fill;
       }
@@ -245,11 +243,11 @@
       .section {
         width: 65%;
         margin: 0 auto var(--section-gap);
-        padding: var(--section-pad);
+        padding: var(--section-padding);
         border: 2px solid var(--color-accent);
         position: relative;
         background-color: var(--color-bg);
-        padding-bottom: calc(var(--section-pad) + 3.5rem);
+        padding-bottom: calc(var(--section-padding) + 3.5rem);
         transition: box-shadow 0.2s;
       }
 
@@ -266,7 +264,7 @@
         text-transform: uppercase;
         position: absolute;
         top: 0;
-        left: var(--section-pad);
+        left: var(--section-padding);
         transform: translateY(-50%);
         padding: 0 0.4rem;
         background-color: var(--color-bg);
@@ -286,7 +284,7 @@
       }
 
       .section-body {
-        font-size: var(--body-text);
+        font-size: var(--body-font-size);
         line-height: 1.6;
         max-width: 55ch;
       }
@@ -313,7 +311,7 @@
         min-height: 100%;
       }
 
-      .interstitial {
+      .work-section {
         background-color: var(--color-bg);
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='60'%3E%3Ccircle cx='0' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='36' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='36' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='44' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='44' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='52' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='52' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='56' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='56' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='56' r='1' fill='%23d6e0ff'/%3E%3C/svg%3E");
         background-size: 8px 60px;
@@ -328,8 +326,8 @@
         position: relative;
       }
 
-      .interstitial::before,
-      .interstitial::after {
+      .work-section::before,
+      .work-section::after {
         content: '';
         position: absolute;
         top: 0;
@@ -340,17 +338,17 @@
         background-size: 36px 48px;
       }
 
-      .interstitial::before {
+      .work-section::before {
         left: 0;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='48'%3E%3Cpolygon points='27,24 25.73,26.07 25.79,28.5 23.66,29.66 22.5,31.79 20.07,31.73 18,33 15.93,31.73 13.5,31.79 12.34,29.66 10.21,28.5 10.27,26.07 9,24 10.27,21.93 10.21,19.5 12.34,18.34 13.5,16.21 15.93,16.27 18,15 20.07,16.27 22.5,16.21 23.66,18.34 25.79,19.5 25.73,21.93' fill='%231a56ff'/%3E%3Cline x1='35' y1='0' x2='35' y2='48' stroke='%237a9fff' stroke-width='1' stroke-dasharray='8,4'/%3E%3C/svg%3E");
       }
 
-      .interstitial::after {
+      .work-section::after {
         right: 0;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='48'%3E%3Cpolygon points='27,24 25.73,26.07 25.79,28.5 23.66,29.66 22.5,31.79 20.07,31.73 18,33 15.93,31.73 13.5,31.79 12.34,29.66 10.21,28.5 10.27,26.07 9,24 10.27,21.93 10.21,19.5 12.34,18.34 13.5,16.21 15.93,16.27 18,15 20.07,16.27 22.5,16.21 23.66,18.34 25.79,19.5 25.73,21.93' fill='%231a56ff'/%3E%3Cline x1='1' y1='0' x2='1' y2='48' stroke='%237a9fff' stroke-width='1' stroke-dasharray='8,4'/%3E%3C/svg%3E");
       }
 
-      .card-page {
+      .contact-section {
         min-height: 100vh;
         min-height: 100svh;
         display: flex;
@@ -408,7 +406,7 @@
         text-transform: uppercase;
       }
 
-      .card-meta-right {
+      .card-links {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
@@ -526,7 +524,7 @@
           max-width: 100vw;
         }
 
-        .card-meta-right {
+        .card-links {
           max-width: 100%;
           overflow-wrap: break-word;
         }
@@ -537,8 +535,8 @@
   <body>
     <main>
       <nav>
-        <a href="#section-1">design</a>
-        <a href="#section-2">writing</a>
+        <a href="#design">design</a>
+        <a href="#writing">writing</a>
         <a href="#contact">contact</a>
         <div class="nav-line"></div>
       </nav>
@@ -552,9 +550,9 @@
       </div>
       <img class="hero-portrait" src="img/half-portrait-solid.avif" alt="">
     </main>
-    <div class="interstitial">
+    <div class="work-section">
       <div class="container">
-        <section id="section-1" class="section" data-index="01">
+        <section id="design" class="section" data-index="01">
           <h2>Design</h2>
           <p class="section-body">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
@@ -564,7 +562,7 @@
           </p>
         </section>
 
-        <section id="section-2" class="section" data-index="02">
+        <section id="writing" class="section" data-index="02">
           <h2>Writing</h2>
           <p class="section-body">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
@@ -575,13 +573,13 @@
         </section>
       </div>
     </div>
-    <section class="card-page" id="contact">
+    <section class="contact-section" id="contact">
       <p class="card-eyebrow">Here's my card.</p>
       <div class="business-card">
         <div class="card-name">Amadeus Kang</div>
         <div class="card-role">Designer &amp; Developer</div>
         <div class="card-meta">
-          <div class="card-meta-right">
+          <div class="card-links">
             <a href="mailto:amadeuskang@gmail.com">amadeuskang@gmail.com</a>
             <a href="https://linkedin.com/in/amadeuskang" target="_blank" rel="noopener">linkedin.com/in/amadeuskang</a>
             <a href="https://github.com/amadeuswolfkang" target="_blank" rel="noopener">github.com/amadeuswolfkang</a>
@@ -605,7 +603,7 @@
     <script>
       gsap.registerPlugin(ScrollTrigger);
 
-      // Lenis smooth scroll is desktop-only; interpolation adds latency that feels laggy on touch devices
+      // Keep native scrolling on touch devices.
       const isTouch = navigator.maxTouchPoints > 0;
       let lenis;
 
@@ -659,9 +657,9 @@
       let cardReady = false;
       gsap.set(card, { y: '200vh', rotation: -722, opacity: 0 });
 
-      // overwrite: true kills any active hover tweens before each enter/leave, preventing stuck state
+      // Prevent overlapping hover and entrance tweens.
       ScrollTrigger.create({
-        trigger: '.card-page',
+        trigger: '.contact-section',
         start: 'top 20%',
         onEnter: () => {
           cardReady = false;
@@ -670,7 +668,7 @@
             { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 0.9, ease: 'expo.out', overwrite: true }
           );
           gsap.fromTo(card,
-            { y: '200vh', rotation: -722, opacity: 0 }, // -722 = two full spins (-720) + landing angle (-2)
+            { y: '200vh', rotation: -722, opacity: 0 }, // Two full spins plus the final -2deg angle.
             { y: 0, rotation: -2, opacity: 1, duration: 0.9, ease: 'expo.out', overwrite: true, onComplete: () => { cardReady = true; } }
           );
         },
@@ -689,7 +687,7 @@
         gsap.to(card, { rotation: -2, y: 0, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
       });
 
-      ['main', '.interstitial'].forEach(sel => {
+      ['main', '.work-section'].forEach(sel => {
         gsap.to(sel, {
           scale: 0.78,
           ease: 'none',
@@ -701,7 +699,7 @@
         gsap.fromTo(sel,
           { clipPath: 'inset(0 0 100% 0)', y: 60 },
           { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.4, ease: 'expo.out', delay: i * 0.15,
-            scrollTrigger: { trigger: '.footer-brand', start: 'top bottom', toggleActions: 'play none none reverse' } // "top bottom" fires on enter; percentage-based starts can be unreachable on short mobile viewports
+            scrollTrigger: { trigger: '.footer-brand', start: 'top bottom', toggleActions: 'play none none reverse' }
           }
         );
       });
