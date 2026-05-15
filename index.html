@@ -67,7 +67,6 @@
         --blue: #1a56ff;
         --blue-light: #7a9fff;
         --blue-pale: #d6e0ff;
-        --gray: #888888;
         --black: #28282b;
         --white: #fefefe;
 
@@ -75,7 +74,7 @@
         --content-width: 90%;
         --section-gap: clamp(3rem, 5vw, 6rem);
         --section-padding: clamp(1.25rem, 3vw, 3rem);
-        --body-font-size: clamp(18px, 1.8vw, 24px);
+        --body-font-size: clamp(16px, 1vw + 10px, 20px);
         --font-ui: "Archivo", sans-serif;
 
         /* Semantic tokens */
@@ -183,6 +182,8 @@
         pointer-events: none;
         opacity: 0;
         animation: skylineFadeIn 2s ease 3.5s forwards;
+        will-change: opacity;
+        contain: paint;
       }
 
       @keyframes skylineFadeIn {
@@ -482,7 +483,7 @@
         font-style: normal;
         font-weight: 400;
         font-size: clamp(0.75rem, 1.2vw, 1rem);
-        color: var(--color-fg-subtle);
+        color: var(--color-bg-subtle);
         text-transform: uppercase;
         letter-spacing: 0.05em;
       }
@@ -543,6 +544,33 @@
           overflow-wrap: break-word;
         }
 
+        .work-section {
+          width: calc(100% - 8px);
+        }
+
+        .work-section .container {
+          width: 100%;
+        }
+
+        .work-section .section {
+          width: auto;
+          margin-left: calc(24px + 0.5rem);
+          margin-right: calc(24px + 0.5rem);
+          padding-left: 0.75rem;
+          padding-right: 0.75rem;
+          padding-bottom: calc(var(--section-padding) + 2rem);
+        }
+
+        .work-section .section::after {
+          font-size: 1rem;
+        }
+
+        .work-section::before,
+        .work-section::after {
+          width: 24px;
+          background-size: 24px 32px;
+        }
+
         .work-section .section:last-child {
           margin-bottom: 0;
         }
@@ -593,7 +621,7 @@
         <a href="#contact">contact</a>
         <div class="nav-line"></div>
       </nav>
-      <img class="hero-skyline" src="img/dc-skyline.avif" alt="">
+      <img class="hero-skyline" src="img/dc-skyline.avif" alt="" decoding="async" fetchpriority="low">
       <div class="container">
         <div class="hero">
           <h1>Amadeus Kang</h1>
@@ -601,14 +629,14 @@
           <p class="subtitle">based in Washington DC.</p>
         </div>
       </div>
-      <img class="hero-portrait" src="img/half-portrait-solid.avif" alt="">
+      <img class="hero-portrait" src="img/half-portrait-solid.avif" alt="Bitmap portrait of Amadeus Kang">
     </main>
     <div class="work-section">
       <div class="container">
         <section id="design" class="section" data-index="01">
           <h2>Design</h2>
           <p class="section-body">
-            Selected design work coming soon.
+            Selected design work coming soon. anfdeuwhf weufwehefiwehfwhiehfweiu
           </p>
         </section>
 
