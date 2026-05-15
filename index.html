@@ -530,6 +530,36 @@
         }
       }
 
+      @media (prefers-reduced-motion: reduce) {
+        .js h1,
+        .js .subtitle,
+        .js nav a,
+        .card-eyebrow,
+        .hero-portrait,
+        .footer-name,
+        .footer-bottom {
+          clip-path: inset(0 0 0 0);
+        }
+
+        .nav-line {
+          transform: scaleX(1);
+        }
+
+        .hero-skyline {
+          animation: none;
+          opacity: 0.45;
+        }
+
+        .hero-portrait {
+          animation: none;
+          transition: none;
+        }
+
+        .hero-portrait:hover {
+          transform: none;
+        }
+      }
+
     </style>
   </head>
   <body>
@@ -555,20 +585,14 @@
         <section id="design" class="section" data-index="01">
           <h2>Design</h2>
           <p class="section-body">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
+            Selected design work coming soon.
           </p>
         </section>
 
         <section id="writing" class="section" data-index="02">
           <h2>Writing</h2>
           <p class="section-body">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
+            Written articles coming soon.
           </p>
         </section>
       </div>
@@ -605,9 +629,10 @@
 
       // Keep native scrolling on touch devices.
       const isTouch = navigator.maxTouchPoints > 0;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       let lenis;
 
-      if (!isTouch) {
+      if (!isTouch && !prefersReducedMotion) {
         lenis = new Lenis({ lerp: 0.2 });
         gsap.ticker.add((time) => { lenis.raf(time * 1000); });
         lenis.on('scroll', ScrollTrigger.update);
@@ -624,7 +649,7 @@
           if (lenis) {
             lenis.scrollTo(target, { offset: -60 });
           } else {
-            target.scrollIntoView({ behavior: 'smooth' });
+            target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
           }
         });
       });
@@ -632,88 +657,99 @@
       document.getElementById("year").textContent = new Date().getFullYear();
 
       const subtitles = gsap.utils.toArray('.subtitle');
-      gsap.set(['h1', ...subtitles], { y: 20 });
-
-      const tl = gsap.timeline();
-
-      tl.to('h1', { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 0.5)
-        .to('h1', { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 0.5);
-
-      tl.to(subtitles[0], { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 1.0)
-        .to(subtitles[0], { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 1.0);
-
-      tl.to(subtitles[1], { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 1.5)
-        .to(subtitles[1], { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 1.5);
-
-      tl.to('.nav-line', { scaleX: 1, duration: 0.5, ease: 'expo.out' }, 2.0);
-
-      tl.to('nav a', {
-        clipPath: 'inset(0 0% 0 0)',
-        duration: 0.5,
-        ease: 'expo.out',
-      }, 2.0);
-
       const card = document.querySelector('.business-card');
       let cardReady = false;
-      gsap.set(card, { y: '200vh', rotation: -722, opacity: 0 });
 
-      // Prevent overlapping hover and entrance tweens.
-      ScrollTrigger.create({
-        trigger: '.contact-section',
-        start: 'top 20%',
-        onEnter: () => {
-          cardReady = false;
-          gsap.fromTo('.card-eyebrow',
-            { clipPath: 'inset(0 0 100% 0)', y: 20 },
-            { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 0.9, ease: 'expo.out', overwrite: true }
-          );
-          gsap.fromTo(card,
-            { y: '200vh', rotation: -722, opacity: 0 }, // Two full spins plus the final -2deg angle.
-            { y: 0, rotation: -2, opacity: 1, duration: 0.9, ease: 'expo.out', overwrite: true, onComplete: () => { cardReady = true; } }
-          );
-        },
-        onLeaveBack: () => {
-          cardReady = false;
-          gsap.to('.card-eyebrow', { clipPath: 'inset(0 0 100% 0)', y: 20, duration: 0.6, ease: 'expo.in', overwrite: true });
-          gsap.to(card, { y: '200vh', rotation: -722, opacity: 0, duration: 0.9, ease: 'expo.in', overwrite: true });
-        },
-      });
+      if (prefersReducedMotion) {
+        cardReady = true;
+        gsap.set(['h1', ...subtitles, 'nav a', '.card-eyebrow', '.footer-name', '.footer-bottom'], { clearProps: 'all' });
+        gsap.set('.nav-line', { scaleX: 1 });
+        gsap.set(card, { y: 0, rotation: -2, opacity: 1 });
+      } else {
+        gsap.set(['h1', ...subtitles], { y: 20 });
+
+        const tl = gsap.timeline();
+
+        tl.to('h1', { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 0.5)
+          .to('h1', { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 0.5);
+
+        tl.to(subtitles[0], { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 1.0)
+          .to(subtitles[0], { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 1.0);
+
+        tl.to(subtitles[1], { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 1.5)
+          .to(subtitles[1], { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 1.5);
+
+        tl.to('.nav-line', { scaleX: 1, duration: 0.5, ease: 'expo.out' }, 2.0);
+
+        tl.to('nav a', {
+          clipPath: 'inset(0 0% 0 0)',
+          duration: 0.5,
+          ease: 'expo.out',
+        }, 2.0);
+
+        gsap.set(card, { y: '200vh', rotation: -722, opacity: 0 });
+
+        // Prevent overlapping hover and entrance tweens.
+        ScrollTrigger.create({
+          trigger: '.contact-section',
+          start: 'top 20%',
+          onEnter: () => {
+            cardReady = false;
+            gsap.fromTo('.card-eyebrow',
+              { clipPath: 'inset(0 0 100% 0)', y: 20 },
+              { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 0.9, ease: 'expo.out', overwrite: true }
+            );
+            gsap.fromTo(card,
+              { y: '200vh', rotation: -722, opacity: 0 }, // Two full spins plus the final -2deg angle.
+              { y: 0, rotation: -2, opacity: 1, duration: 0.9, ease: 'expo.out', overwrite: true, onComplete: () => { cardReady = true; } }
+            );
+          },
+          onLeaveBack: () => {
+            cardReady = false;
+            gsap.to('.card-eyebrow', { clipPath: 'inset(0 0 100% 0)', y: 20, duration: 0.6, ease: 'expo.in', overwrite: true });
+            gsap.to(card, { y: '200vh', rotation: -722, opacity: 0, duration: 0.9, ease: 'expo.in', overwrite: true });
+          },
+        });
+
+        ['main', '.work-section'].forEach(sel => {
+          gsap.to(sel, {
+            scale: 0.78,
+            ease: 'none',
+            scrollTrigger: { trigger: sel, start: 'center top', end: 'bottom top', scrub: true },
+          });
+        });
+
+        gsap.to('.hero-skyline', {
+          y: '-12%',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: 'main',
+            start: 'top top',
+            end: 'bottom top',
+            scrub: true,
+          }
+        });
+      }
+
       card.addEventListener('mouseenter', () => {
-        if (!cardReady) return;
+        if (!cardReady || prefersReducedMotion) return;
         gsap.to(card, { rotation: 0, y: -8, duration: 0.15, ease: 'power3.out', overwrite: 'auto' });
       });
       card.addEventListener('mouseleave', () => {
-        if (!cardReady) return;
+        if (!cardReady || prefersReducedMotion) return;
         gsap.to(card, { rotation: -2, y: 0, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
       });
 
-      ['main', '.work-section'].forEach(sel => {
-        gsap.to(sel, {
-          scale: 0.78,
-          ease: 'none',
-          scrollTrigger: { trigger: sel, start: 'center top', end: 'bottom top', scrub: true },
+      if (!prefersReducedMotion) {
+        ['.footer-name', '.footer-bottom'].forEach((sel, i) => {
+          gsap.fromTo(sel,
+            { clipPath: 'inset(0 0 100% 0)', y: 60 },
+            { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.4, ease: 'expo.out', delay: i * 0.15,
+              scrollTrigger: { trigger: '.footer-brand', start: 'top bottom', toggleActions: 'play none none reverse' }
+            }
+          );
         });
-      });
-
-      ['.footer-name', '.footer-bottom'].forEach((sel, i) => {
-        gsap.fromTo(sel,
-          { clipPath: 'inset(0 0 100% 0)', y: 60 },
-          { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.4, ease: 'expo.out', delay: i * 0.15,
-            scrollTrigger: { trigger: '.footer-brand', start: 'top bottom', toggleActions: 'play none none reverse' }
-          }
-        );
-      });
-
-      gsap.to('.hero-skyline', {
-        y: '-12%',
-        ease: 'none',
-        scrollTrigger: {
-          trigger: 'main',
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true,
-        }
-      });
+      }
 
     </script>
   </body>
