@@ -247,17 +247,9 @@
         right: 0;
         height: min(max(52vw, 60svh), 858px, 92svh);
         width: auto;
-        transform-origin: right bottom;
         clip-path: inset(0 0 100% 0);
         filter: drop-shadow(0px 6px 8px rgba(0, 5, 20, 0.2));
         animation: portraitWipeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 2.5s forwards;
-        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-                    filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      }
-
-      .hero-portrait:hover {
-        transform: scale(1.01);
-        filter: drop-shadow(-3px 10px 10px rgba(0, 5, 20, 0.24));
       }
 
       @keyframes portraitWipeUp {
@@ -267,7 +259,7 @@
       h1 {
         font-family: "Nyght Serif", serif;
         font-weight: 900;
-        font-size: clamp(2.5rem, 7vw, 6rem);
+        font-size: clamp(2.5rem, 8vw, 8rem);
         line-height: 1.05;
         color: var(--color-accent);
         letter-spacing: -0.02em;
@@ -615,11 +607,6 @@
           transform: translateX(20vw);
           max-height: min(60svh, 760px);
           max-width: 100vw;
-          transition: none;
-        }
-
-        .hero-portrait:hover {
-          transform: translateX(20vw);
         }
 
         .card-links {
@@ -690,7 +677,6 @@
 
         .hero-portrait {
           animation: none;
-          transition: none;
         }
       }
 
