@@ -188,24 +188,29 @@
         letter-spacing: 0.02em;
         text-transform: uppercase;
         position: relative;
-        padding-bottom: 4px;
+        padding: 2px 6px;
+        isolation: isolate;
+        transition: color 0.2s cubic-bezier(0.85, 0, 0.15, 1);
       }
 
       nav a::after {
         content: "";
         position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
+        inset: 0;
         background: var(--color-accent);
         transform: scaleX(0);
-        transform-origin: left;
+        transform-origin: right;
         transition: transform 0.2s cubic-bezier(0.85, 0, 0.15, 1);
+        z-index: -1;
       }
 
-      nav a:hover::after {
+      nav a.is-hovering {
+        color: var(--color-fg-inverse);
+      }
+
+      nav a.is-hovering::after {
         transform: scaleX(1);
+        transform-origin: left;
       }
 
       .hero {
@@ -470,24 +475,29 @@
         color: inherit;
         text-decoration: none;
         position: relative;
+        padding: 1px 4px;
+        isolation: isolate;
+        transition: color 0.2s cubic-bezier(0.85, 0, 0.15, 1);
       }
 
       .card-meta a::after {
         content: "";
         position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
+        inset: 0;
         background: var(--color-accent);
-        transform: scaleX(0) translateZ(0);
-        transform-origin: left;
+        transform: scaleX(0);
+        transform-origin: right;
         transition: transform 0.2s cubic-bezier(0.85, 0, 0.15, 1);
-        will-change: transform;
+        z-index: -1;
       }
 
-      .card-meta a:hover::after {
-        transform: scaleX(1) translateZ(0);
+      .card-meta a.is-hovering {
+        color: var(--color-fg-inverse);
+      }
+
+      .card-meta a.is-hovering::after {
+        transform: scaleX(1);
+        transform-origin: left;
       }
 
       footer {
@@ -865,6 +875,28 @@
           );
         });
       }
+
+      document.querySelectorAll('nav a, .card-meta a').forEach((link) => {
+        const minDuration = 200;
+        let enteredAt = 0;
+        let pendingRelease = null;
+        link.addEventListener('mouseenter', () => {
+          if (pendingRelease) {
+            clearTimeout(pendingRelease);
+            pendingRelease = null;
+          }
+          link.classList.add('is-hovering');
+          enteredAt = performance.now();
+        });
+        link.addEventListener('mouseleave', () => {
+          const elapsed = performance.now() - enteredAt;
+          const remaining = Math.max(0, minDuration - elapsed);
+          pendingRelease = setTimeout(() => {
+            link.classList.remove('is-hovering');
+            pendingRelease = null;
+          }, remaining);
+        });
+      });
 
     </script>
   </body>
