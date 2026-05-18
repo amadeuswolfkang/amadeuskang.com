@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>OG card — Amadeus Kang</title>
+    <style>
+      @font-face {
+        font-family: "Nyght Serif";
+        src: url("fonts/NyghtSerif/NyghtSerif-Dark.woff2") format("woff2");
+        font-weight: 900;
+        font-style: normal;
+        font-display: block;
+      }
+      @font-face {
+        font-family: "Nyght Serif";
+        src: url("fonts/NyghtSerif/NyghtSerif-Bold.woff2") format("woff2");
+        font-weight: 700;
+        font-style: normal;
+        font-display: block;
+      }
+
+      :root {
+        --blue: #1a56ff;
+        --bg: #ffffff;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #222;
+      }
+
+      .og {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        background: var(--bg);
+        overflow: hidden;
+        margin: 24px auto;
+        box-shadow: 0 0 0 1px #444;
+      }
+
+      .og-skyline {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        opacity: 0.45;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .og-name {
+        position: absolute;
+        font-family: "Nyght Serif", serif;
+        font-weight: 900;
+        font-size: 260px;
+        line-height: 0.9;
+        letter-spacing: -0.06em;
+        color: var(--blue);
+        margin: 0;
+        -webkit-text-stroke: 6px var(--bg);
+        paint-order: stroke fill;
+        z-index: 1;
+      }
+
+      .og-name--first {
+        top: 0px;
+        left: 0px;
+      }
+
+      .og-name--last {
+        bottom: -12px;
+        right: 0px;
+        z-index: 3;
+      }
+
+      .og-portrait {
+        position: absolute;
+        bottom: -140px;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 650px;
+        width: auto;
+        filter: drop-shadow(0px 6px 8px rgba(0, 5, 20, 0.2));
+        z-index: 2;
+      }
+
+      /* Tweak knobs — adjust to taste before screenshotting */
+      /* .og h1            -> font-size, line-height */
+      /* .og .subtitle     -> font-size, line-height */
+      /* .og-content       -> top, left, max-width */
+      /* .og-portrait      -> height, right offset */
+    </style>
+  </head>
+  <body>
+    <!--
+      How to capture:
+      1. Open this file in Chrome.
+      2. DevTools (F12) > toggle device toolbar (Ctrl+Shift+M) > set custom size 1200 x 630.
+      3. DevTools command menu (Ctrl+Shift+P) > "Capture node screenshot" (with .og selected in Elements)
+         OR "Capture full size screenshot" while emulating 1200x630.
+      4. Save the PNG as img/og-image.png.
+    -->
+    <div class="og">
+      <img class="og-skyline" src="img/dc-skyline.avif" alt="">
+      <h1 class="og-name og-name--first">Amadeus</h1>
+      <h1 class="og-name og-name--last">Kang</h1>
+      <img class="og-portrait" src="img/half-portrait-solid.avif" alt="">
+    </div>
+  </body>
+</html>
