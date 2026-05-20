@@ -444,6 +444,7 @@
         justify-content: flex-start;
         gap: clamp(2.5rem, 5vw, 5rem);
         padding: clamp(3rem, 8svh, 5rem) 0;
+        margin-top: clamp(5rem, 12vw, 12rem);
         overflow: clip;
       }
 
@@ -891,7 +892,7 @@
         // Prevent overlapping hover and entrance tweens.
         ScrollTrigger.create({
           trigger: '.contact-section',
-          start: 'top 80%',
+          start: isTouch ? 'top 45%' : 'top 80%',
           onEnter: () => {
             cardReady = false;
             gsap.fromTo('.card-eyebrow',
