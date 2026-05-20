@@ -172,10 +172,15 @@
         position: relative;
       }
 
-      /* Initial GSAP reveal state; bottom inset preserves descenders. */
+      /* Initial reveal state; JS wraps hero text before showing it. */
       .js h1,
       .js .subtitle {
-        clip-path: inset(120% 0 -0.2em 0);
+        visibility: hidden;
+      }
+
+      .js h1.is-wrapped,
+      .js .subtitle.is-wrapped {
+        visibility: visible;
       }
 
       .nav-line {
@@ -245,13 +250,13 @@
         height: auto;
         pointer-events: none;
         opacity: 0;
-        animation: skylineFadeIn 2s ease 3.5s forwards;
+        animation: skylineFadeIn 2s ease 2.5s forwards;
         will-change: opacity;
         contain: paint;
       }
 
       @keyframes skylineFadeIn {
-        to { opacity: 0.45; }
+        to { opacity: 0.5; }
       }
 
       .hero-portrait {
@@ -292,6 +297,32 @@
 
       .subtitle + .subtitle {
         margin-top: 0;
+      }
+
+      .hero-line {
+        display: block;
+        width: fit-content;
+        max-width: 100%;
+        position: relative;
+        overflow: hidden;
+        padding-right: 0.08em;
+      }
+
+      .hero-line-inner {
+        display: inline-block;
+        opacity: 0;
+      }
+
+      .hero-line-mask {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0%;
+        height: 100%;
+        background: currentColor;
+        pointer-events: none;
+        transform-origin: left center;
+        z-index: 2;
       }
 
       .section {
@@ -507,7 +538,7 @@
 
       footer {
         width: 100%;
-        padding: clamp(4rem, 8vw, 15rem) 0 0;
+        padding: clamp(8rem, 8vw, 15rem) 0 0;
         position: relative;
       }
 
@@ -669,14 +700,20 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
-        .js h1,
-        .js .subtitle,
         .js nav a,
         .card-eyebrow,
         .hero-portrait,
         .footer-name,
         .footer-bottom {
           clip-path: inset(0 0 0 0);
+        }
+
+        .hero-line-inner {
+          opacity: 1;
+        }
+
+        .hero-line-mask {
+          display: none;
         }
 
         .nav-line {
@@ -791,27 +828,55 @@
       document.getElementById("year").textContent = new Date().getFullYear();
 
       const subtitles = gsap.utils.toArray('.subtitle');
+      const heroText = [document.querySelector('h1'), ...subtitles];
       const card = document.querySelector('.business-card');
       let cardReady = false;
 
+      const heroLines = heroText.map((element) => {
+        const line = document.createElement('span');
+        const inner = document.createElement('span');
+        const mask = document.createElement('span');
+
+        line.className = 'hero-line';
+        inner.className = 'hero-line-inner';
+        mask.className = 'hero-line-mask';
+        inner.textContent = element.textContent;
+
+        element.textContent = '';
+        line.append(inner, mask);
+        element.append(line);
+        element.classList.add('is-wrapped');
+
+        return line;
+      });
+
+      const revealHeroLine = (index) => {
+        const line = heroLines[index];
+        if (!line) return;
+
+        const inner = line.querySelector('.hero-line-inner');
+        const mask = line.querySelector('.hero-line-mask');
+        gsap.timeline()
+          .to(mask, { width: '100%', duration: 0.38, ease: 'expo.inOut' })
+          .set(inner, { opacity: 1 }, '>-0.04')
+          .to(mask, { xPercent: 101, duration: 0.45, ease: 'expo.inOut' }, '>-0.02');
+      };
+
       if (prefersReducedMotion) {
         cardReady = true;
-        gsap.set(['h1', ...subtitles, 'nav a', '.card-eyebrow', '.footer-name', '.footer-bottom'], { clearProps: 'all' });
+        gsap.set('.hero-line-inner', { opacity: 1 });
+        gsap.set('.hero-line-mask', { display: 'none' });
+        gsap.set([...heroText, 'nav a', '.card-eyebrow', '.footer-name', '.footer-bottom'], { clearProps: 'all' });
         gsap.set('.nav-line', { scaleX: 1 });
         gsap.set(card, { y: 0, rotation: -2, opacity: 1 });
       } else {
-        gsap.set(['h1', ...subtitles], { y: 20 });
-
         const tl = gsap.timeline();
 
-        tl.to('h1', { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 0.5)
-          .to('h1', { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 0.5);
+        tl.call(() => revealHeroLine(0), null, 0.42);
 
-        tl.to(subtitles[0], { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 1.0)
-          .to(subtitles[0], { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 1.0);
+        tl.call(() => revealHeroLine(1), null, 0.85);
 
-        tl.to(subtitles[1], { clipPath: 'inset(0% 0 -0.2em 0)', duration: 0.6, ease: 'expo.out' }, 1.5)
-          .to(subtitles[1], { y: 0, duration: 0.8, ease: 'back.out(1.5)' }, 1.5);
+        tl.call(() => revealHeroLine(2), null, 1.28);
 
         tl.to('.nav-line', { scaleX: 1, duration: 0.5, ease: 'expo.out' }, 2.0);
 
