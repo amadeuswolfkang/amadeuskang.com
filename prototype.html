@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="mauve">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Prototype</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600&family=Michroma&family=Share+Tech+Mono&family=Victor+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    color-scheme: dark;
+    --c-bg:       #032221;
+    --c-surface:  #473A74;
+    --c-border:   #8D95EF;
+    --c-text-1:   #F6AFFD;
+    --c-text-2:   #8D95EF;
+    --c-accent:   #F6AFFD;
+    --c-code-bg:  #595534;
+    --c-code-text:#F6AFFD;
+    --c-code-meta:#F6AFFD;
+    --c-code-button-bg: #8D95EF;
+    --c-code-button-text: #032221;
+    --mesh-1: rgba(246, 175, 253, 0.35);
+    --mesh-2: rgba(141, 149, 239, 0.55);
+    --mesh-3: rgba(71, 58, 116, 0.60);
+    --mesh-4: rgba(89, 85, 52, 0.42);
+    --mesh-5: rgba(3, 34, 33, 0.80);
+  }
+
+  html[data-theme="blush"] {
+    --c-bg: #3C104D;
+    --c-surface: #5B2F1C;
+    --c-border: #C25628;
+    --c-text-1: #FCE1D9;
+    --c-text-2: #FAE440;
+    --c-accent: #FAE440;
+    --c-code-bg: #5B2F1C;
+    --c-code-text: #FCE1D9;
+    --c-code-meta: #FAE440;
+    --c-code-button-bg: #FCE1D9;
+    --c-code-button-text: #5B2F1C;
+    --mesh-1: rgba(250, 228, 64, 0.58);
+    --mesh-2: rgba(252, 225, 217, 0.40);
+    --mesh-3: rgba(194, 86, 40, 0.52);
+    --mesh-4: rgba(91, 47, 28, 0.60);
+    --mesh-5: rgba(60, 16, 77, 0.82);
+  }
+
+  html[data-theme="surge"] {
+    --c-bg: #4125A7;
+    --c-surface: #4125A7;
+    --c-border: #FEA06D;
+    --c-text-1: #F9FFE9;
+    --c-text-2: #EDE273;
+    --c-accent: #EDE273;
+    --c-code-bg: #24C2E5;
+    --c-code-text: #4125A7;
+    --c-code-meta: #4125A7;
+    --c-code-button-bg: #4125A7;
+    --c-code-button-text: #24C2E5;
+    --mesh-1: rgba(249, 255, 233, 0.44);
+    --mesh-2: rgba(254, 160, 109, 0.48);
+    --mesh-3: rgba(237, 226, 115, 0.50);
+    --mesh-4: rgba(36, 194, 229, 0.55);
+    --mesh-5: rgba(65, 37, 167, 0.72);
+  }
+
+  html[data-theme="cherry"] {
+    --c-bg: #500303;
+    --c-surface: #5D737E;
+    --c-border: #D0E1CB;
+    --c-text-1: #D0E1CB;
+    --c-text-2: #F1E379;
+    --c-accent: #87BBA2;
+    --c-code-bg: #F1E379;
+    --c-code-text: #500303;
+    --c-code-meta: #5D737E;
+    --c-code-button-bg: #500303;
+    --c-code-button-text: #D0E1CB;
+    --mesh-1: rgba(241, 227, 121, 0.50);
+    --mesh-2: rgba(208, 225, 203, 0.44);
+    --mesh-3: rgba(135, 187, 162, 0.52);
+    --mesh-4: rgba(93, 115, 126, 0.60);
+    --mesh-5: rgba(80, 3, 3, 0.80);
+  }
+
+  html[data-theme="alice"] {
+    --c-bg: #0C0D45;
+    --c-surface: #3E5BA3;
+    --c-border: #75CBD1;
+    --c-text-1: #DAE8FB;
+    --c-text-2: #F2D2FF;
+    --c-accent: #75CBD1;
+    --c-code-bg: #F2D2FF;
+    --c-code-text: #0C0D45;
+    --c-code-meta: #3E5BA3;
+    --c-code-button-bg: #0C0D45;
+    --c-code-button-text: #75CBD1;
+    --mesh-1: rgba(218, 232, 251, 0.48);
+    --mesh-2: rgba(242, 210, 255, 0.46);
+    --mesh-3: rgba(117, 203, 209, 0.50);
+    --mesh-4: rgba(62, 91, 163, 0.62);
+    --mesh-5: rgba(12, 13, 69, 0.82);
+  }
+
+  html[data-theme="azure"] {
+    --c-bg: #001B29;
+    --c-surface: #333C77;
+    --c-border: #A4CBE3;
+    --c-text-1: #E2F5F3;
+    --c-text-2: #4DD4CD;
+    --c-accent: #4DD4CD;
+    --c-code-bg: #A4CBE3;
+    --c-code-text: #001B29;
+    --c-code-meta: #333C77;
+    --c-code-button-bg: #333C77;
+    --c-code-button-text: #E2F5F3;
+    --mesh-1: rgba(226, 245, 243, 0.44);
+    --mesh-2: rgba(164, 203, 227, 0.52);
+    --mesh-3: rgba(77, 212, 205, 0.54);
+    --mesh-4: rgba(51, 60, 119, 0.64);
+    --mesh-5: rgba(0, 27, 41, 0.84);
+  }
+
+  html[data-theme="apricot"] {
+    --c-bg: #290024;
+    --c-surface: #775533;
+    --c-border: #D4954D;
+    --c-text-1: #F2F5E2;
+    --c-text-2: #E3DEA4;
+    --c-accent: #E3DEA4;
+    --c-code-bg: #D4954D;
+    --c-code-text: #290024;
+    --c-code-meta: #290024;
+    --c-code-button-bg: #290024;
+    --c-code-button-text: #F2F5E2;
+    --mesh-1: rgba(242, 245, 226, 0.46);
+    --mesh-2: rgba(227, 222, 164, 0.52);
+    --mesh-3: rgba(212, 149, 77, 0.58);
+    --mesh-4: rgba(119, 85, 51, 0.60);
+    --mesh-5: rgba(41, 0, 36, 0.84);
+  }
+
+  html[data-theme="violet"] {
+    --c-bg: #242424;
+    --c-surface: #372B63;
+    --c-border: #6E5B9C;
+    --c-text-1: #EFFEF1;
+    --c-text-2: #A6A9C8;
+    --c-accent: #E29036;
+    --c-code-bg: #C9C8FD;
+    --c-code-text: #242424;
+    --c-code-meta: #372B63;
+    --c-code-button-bg: #E29036;
+    --c-code-button-text: #242424;
+    --mesh-1: rgba(239, 254, 241, 0.42);
+    --mesh-2: rgba(201, 200, 253, 0.48);
+    --mesh-3: rgba(145, 109, 188, 0.55);
+    --mesh-4: rgba(188, 98, 127, 0.48);
+    --mesh-5: rgba(36, 36, 36, 0.82);
+  }
+
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--c-bg, #151B30) !important;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    background: var(--c-bg, #151B30) !important;
+    color: var(--c-text-1);
+    line-height: 1.6;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    background: var(--c-accent);
+    color: var(--c-bg);
+  }
+
+  .bg-mesh {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-color: var(--c-bg);
+    background-image:
+      radial-gradient(ellipse 80% 60% at 15% 20%, var(--mesh-1) 0%, transparent 70%),
+      radial-gradient(ellipse 70% 80% at 85% 75%, var(--mesh-2) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 50% at 50% 10%, var(--mesh-3) 0%, transparent 60%),
+      radial-gradient(ellipse 90% 70% at 75% 30%, var(--mesh-4) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 90% at 20% 80%, var(--mesh-5) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 60% 55%, var(--mesh-2) 0%, transparent 50%);
+  }
+
+  .bg-grain {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 6rem 1.5rem;
+    position: relative;
+  }
+
+  .site-header {
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .site-title {
+    font-family: 'Michroma', sans-serif;
+    font-weight: 400;
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--c-text-1);
+  }
+
+  .theme-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: 1px;
+    padding-top: 2.5rem;
+  }
+
+  .theme-button {
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.5rem;
+    border: 0;
+    padding: 0.5rem 0.75rem;
+    background: var(--c-surface);
+    color: var(--c-text-1);
+    font: 500 0.875rem 'Victor Mono', monospace;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .theme-button[aria-pressed="true"],
+  .theme-button:hover {
+    background: var(--c-accent);
+    color: var(--c-bg);
+  }
+
+  .swatch {
+    width: 1rem;
+    height: 1rem;
+    background: var(--swatch);
+  }
+
+  .samples {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+  }
+
+  .sample-label {
+    display: grid;
+    grid-template-columns: 7.25rem minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 0.25rem 0.75rem;
+    font-family: 'Victor Mono', monospace;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--c-text-2);
+  }
+
+  .list-title {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    color: var(--c-text-1);
+    min-width: 0;
+  }
+
+  .articles {
+    padding-top: 2.5rem;
+  }
+
+  .section-label {
+    display: grid;
+    grid-template-columns: 7.25rem minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 0.25rem 0.75rem;
+    border-bottom: 1px solid var(--c-border);
+    font-family: 'Victor Mono', monospace;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--c-text-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .article-list {
+    list-style: none;
+  }
+
+  .article-list-item {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .article-list-item a {
+    display: grid;
+    grid-template-columns: 7.25rem minmax(0, 1fr);
+    align-items: baseline;
+    width: 100%;
+    gap: 1.5rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .article-list-item:hover {
+    background: var(--c-accent);
+  }
+
+  .article-list-item:hover .list-title,
+  .article-list-item:hover .list-date {
+    color: var(--c-bg);
+  }
+
+  .list-date {
+    font-family: 'Victor Mono', monospace;
+    font-size: 0.9375rem;
+    color: var(--c-text-2);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .token-reference {
+    padding-top: 2.5rem;
+  }
+
+  .token-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1px;
+    list-style: none;
+  }
+
+  .token-item {
+    display: flex;
+    flex-direction: column;
+    min-height: 8rem;
+    padding: 0.75rem;
+    background: var(--c-surface);
+    font-family: 'Victor Mono', monospace;
+    font-size: 0.8125rem;
+    color: var(--c-text-2);
+  }
+
+  .token-swatch {
+    width: 100%;
+    height: 3rem;
+    margin-bottom: 0.75rem;
+    background: var(--token-color);
+  }
+
+  .token-name {
+    color: var(--c-text-1);
+  }
+
+  .token-role {
+    margin-top: 0.35rem;
+    line-height: 1.35;
+  }
+
+  .code-block {
+    background: var(--c-code-bg);
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.5rem 0.75rem;
+    color: var(--c-code-meta);
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .copy-button {
+    border: 0;
+    padding: 0 0.5rem;
+    background: var(--c-code-button-bg);
+    color: var(--c-code-button-text);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  pre {
+    margin: 0;
+    padding: 1rem 0.75rem;
+    overflow-x: auto;
+    color: var(--c-code-text);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    tab-size: 2;
+  }
+
+  code {
+    font-family: inherit;
+  }
+
+  .victor {
+    font-family: 'Victor Mono', monospace;
+  }
+
+  .sharetech {
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  @media (max-width: 800px) {
+    .theme-selector,
+    .samples {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page {
+      padding: 4rem 1rem;
+    }
+
+    .theme-selector,
+    .article-list-item a,
+    .samples {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+
+<body>
+<div class="bg-mesh"></div>
+<svg class="bg-grain" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+  <filter id="grain">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+  <rect width="100%" height="100%" filter="url(#grain)" opacity="0.12"/>
+</svg>
+
+<main class="page">
+  <header class="site-header">
+    <h1 class="site-title">Prototype</h1>
+  </header>
+
+  <div class="theme-selector" aria-label="Theme selector">
+    <button class="theme-button" type="button" data-theme="mauve" aria-pressed="true">
+      <span class="swatch" style="--swatch:#F6AFFD"></span>
+      <span>Mauve</span>
+    </button>
+    <button class="theme-button" type="button" data-theme="blush" aria-pressed="false">
+      <span class="swatch" style="--swatch:#FAE440"></span>
+      <span>Blush</span>
+    </button>
+    <button class="theme-button" type="button" data-theme="surge" aria-pressed="false">
+      <span class="swatch" style="--swatch:#24C2E5"></span>
+      <span>Surge</span>
+    </button>
+    <button class="theme-button" type="button" data-theme="cherry" aria-pressed="false">
+      <span class="swatch" style="--swatch:#87BBA2"></span>
+      <span>Cherry</span>
+    </button>
+    <button class="theme-button" type="button" data-theme="alice" aria-pressed="false">
+      <span class="swatch" style="--swatch:#75CBD1"></span>
+      <span>Alice</span>
+    </button>
+    <button class="theme-button" type="button" data-theme="azure" aria-pressed="false">
+      <span class="swatch" style="--swatch:#4DD4CD"></span>
+      <span>Azure</span>
+    </button>
+    <button class="theme-button" type="button" data-theme="apricot" aria-pressed="false">
+      <span class="swatch" style="--swatch:#D4954D"></span>
+      <span>Apricot</span>
+    </button>
+    <button class="theme-button" type="button" data-theme="violet" aria-pressed="false">
+      <span class="swatch" style="--swatch:#E29036"></span>
+      <span>Violet</span>
+    </button>
+  </div>
+
+  <section class="samples" aria-label="Code block font samples">
+    <article>
+      <div class="sample-label">
+        <span>Font</span>
+        <span>Victor Mono</span>
+      </div>
+      <div class="code-block victor">
+        <div class="code-header">
+          <span>javascript</span>
+          <button class="copy-button" type="button">Copy</button>
+        </div>
+        <pre><code>const columns = 48;
+const rows = 18;
+const buffer = new Array(columns * rows).fill(' ');
+
+for (let y = 0; y < rows; y += 1) {
+  for (let x = 0; x < columns; x += 1) {
+    const index = y * columns + x;
+    buffer[index] = x % 7 === 0 ? '*' : '.';
+  }
+}</code></pre>
+      </div>
+    </article>
+
+    <article>
+      <div class="sample-label">
+        <span>Font</span>
+        <span>Share Tech Mono</span>
+      </div>
+      <div class="code-block sharetech">
+        <div class="code-header">
+          <span>javascript</span>
+          <button class="copy-button" type="button">Copy</button>
+        </div>
+        <pre><code>const columns = 48;
+const rows = 18;
+const buffer = new Array(columns * rows).fill(' ');
+
+for (let y = 0; y < rows; y += 1) {
+  for (let x = 0; x < columns; x += 1) {
+    const index = y * columns + x;
+    buffer[index] = x % 7 === 0 ? '*' : '.';
+  }
+}</code></pre>
+      </div>
+    </article>
+  </section>
+
+  <section class="articles">
+    <div class="section-label">
+      <span>Date</span>
+      <span>Name</span>
+    </div>
+    <ul class="article-list">
+      <li class="article-list-item">
+        <a href="#">
+          <span class="list-date">2026-03-19</span>
+          <span class="list-title">What replaced subpixel rendering</span>
+        </a>
+      </li>
+      <li class="article-list-item">
+        <a href="#">
+          <span class="list-date">2026-03-04</span>
+          <span class="list-title">The fastest way to parse CSS custom properties at runtime</span>
+        </a>
+      </li>
+      <li class="article-list-item">
+        <a href="#">
+          <span class="list-date">2026-02-20</span>
+          <span class="list-title">Why your font metrics are wrong</span>
+        </a>
+      </li>
+      <li class="article-list-item">
+        <a href="#">
+          <span class="list-date">2026-02-08</span>
+          <span class="list-title">ResizeObserver patterns that won't tank your frame budget</span>
+        </a>
+      </li>
+      <li class="article-list-item">
+        <a href="#">
+          <span class="list-date">2026-01-25</span>
+          <span class="list-title">Writing a markdown parser in 200 lines</span>
+        </a>
+      </li>
+      <li class="article-list-item">
+        <a href="#">
+          <span class="list-date">2026-01-11</span>
+          <span class="list-title">Text shaping for frontend developers</span>
+        </a>
+      </li>
+      <li class="article-list-item">
+        <a href="#">
+          <span class="list-date">2025-12-30</span>
+          <span class="list-title">An interactive guide to the CSSOM</span>
+        </a>
+      </li>
+      <li class="article-list-item">
+        <a href="#">
+          <span class="list-date">2025-12-14</span>
+          <span class="list-title">Debounce vs. throttle: the visual explanation</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="token-reference" aria-label="Semantic color tokens">
+    <ul class="token-list">
+    </ul>
+  </section>
+</main>
+<script>
+  const themeButtons = document.querySelectorAll('.theme-button');
+  const tokenList = document.querySelector('.token-list');
+  const tokenRoles = [
+    ['--c-bg', 'Page background, inverted hover text'],
+    ['--c-surface', 'Secondary surface, theme buttons'],
+    ['--c-border', 'Rules and dividers'],
+    ['--c-text-1', 'Primary text'],
+    ['--c-text-2', 'Secondary text and labels'],
+    ['--c-accent', 'Interactive highlight'],
+    ['--c-code-bg', 'Code block background'],
+    ['--c-code-text', 'Code text'],
+    ['--c-code-meta', 'Code metadata'],
+    ['--c-code-button-bg', 'Copy button background'],
+    ['--c-code-button-text', 'Copy button text'],
+    ['--mesh-1', 'Background mesh color'],
+    ['--mesh-2', 'Background mesh color'],
+    ['--mesh-3', 'Background mesh color'],
+    ['--mesh-4', 'Background mesh color'],
+    ['--mesh-5', 'Background mesh color'],
+  ];
+
+  const updateTokenReference = () => {
+    const styles = getComputedStyle(document.documentElement);
+    const groups = new Map();
+
+    tokenRoles.forEach(([token, role]) => {
+      const value = styles.getPropertyValue(token).trim();
+      const key = value.toUpperCase();
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(`${token}: ${role}`);
+    });
+
+    tokenList.innerHTML = '';
+    groups.forEach((roles, color) => {
+      const item = document.createElement('li');
+      item.className = 'token-item';
+      item.innerHTML = `
+        <span class="token-swatch" style="--token-color:${color}"></span>
+        <span class="token-name">${color}</span>
+        <span class="token-role">${roles.join('<br>')}</span>
+      `;
+      tokenList.append(item);
+    });
+  };
+
+  themeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      document.documentElement.dataset.theme = button.dataset.theme;
+      themeButtons.forEach((item) => {
+        item.setAttribute('aria-pressed', String(item === button));
+      });
+      updateTokenReference();
+    });
+  });
+
+  document.querySelectorAll('.copy-button').forEach((button) => {
+    button.addEventListener('click', () => {
+      const code = button.closest('.code-block').querySelector('code').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const label = button.textContent;
+        button.textContent = 'Copied';
+        setTimeout(() => { button.textContent = label; }, 1200);
+      });
+    });
+  });
+
+  updateTokenReference();
+</script>
+</body>
+</html>
