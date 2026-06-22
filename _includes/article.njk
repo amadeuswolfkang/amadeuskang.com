@@ -62,4 +62,31 @@ ogType: article
       });
     });
   })();
+
+  // Slide-bar hover on the back link, matching the main site nav/card links:
+  // an .is-hovering class held for a 200ms minimum so quick brushes play the
+  // full enter-then-exit arc instead of being interrupted mid-stride.
+  (function () {
+    document.querySelectorAll('.back-link').forEach((link) => {
+      const minDuration = 200;
+      let enteredAt = 0;
+      let pendingRelease = null;
+      link.addEventListener('mouseenter', () => {
+        if (pendingRelease) {
+          clearTimeout(pendingRelease);
+          pendingRelease = null;
+        }
+        link.classList.add('is-hovering');
+        enteredAt = performance.now();
+      });
+      link.addEventListener('mouseleave', () => {
+        const elapsed = performance.now() - enteredAt;
+        const remaining = Math.max(0, minDuration - elapsed);
+        pendingRelease = setTimeout(() => {
+          link.classList.remove('is-hovering');
+          pendingRelease = null;
+        }, remaining);
+      });
+    });
+  })();
 </script>{% endraw %}
