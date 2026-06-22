@@ -24,10 +24,42 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Michroma&family=Victor+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-{% if ogType == 'article' %}<link href="https://fonts.googleapis.com/css2?family=Gentium+Plus:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">{% endif %}
+{% if ogType == 'article' %}<link rel="preload" href="/fonts/Gentium/Gentium-Regular.woff2" as="font" type="font/woff2" crossorigin>{% endif %}
 <script>document.documentElement.classList.add('js');</script>
 
 {% raw %}<style>
+  /* Self-hosted Gentium (v7) for the article reading font — avoids the
+     cross-origin swap/FOUT. The Regular weight is also preloaded in <head> on
+     article pages. Only the four faces the article uses are declared. */
+  @font-face {
+    font-family: 'Gentium';
+    src: url('/fonts/Gentium/Gentium-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Gentium';
+    src: url('/fonts/Gentium/Gentium-Italic.woff2') format('woff2');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Gentium';
+    src: url('/fonts/Gentium/Gentium-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'Gentium';
+    src: url('/fonts/Gentium/Gentium-BoldItalic.woff2') format('woff2');
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+  }
+
   :root {
     color-scheme: light;
     --c-bg: #f4f2f0;
@@ -323,7 +355,7 @@
 
   .article-body {
     padding-top: 2rem;
-    font-family: 'Gentium Plus', serif;
+    font-family: 'Gentium', serif;
     font-size: 1.25rem;
     line-height: 1.5;
     color: var(--c-text-1);
