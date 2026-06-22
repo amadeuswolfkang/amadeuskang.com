@@ -1,0 +1,49 @@
+---
+layout: base.njk
+title: Blog
+description: Writing on engineering and design by Amadeus Kang.
+---
+<main class="page">
+  <header class="site-header">
+    <h1 class="site-title">
+      <span class="hero-line">
+        <span class="hero-line-inner">Blog</span>
+        <span class="hero-line-mask"></span>
+      </span>
+    </h1>
+  </header>
+
+  <section class="articles">
+    <div class="section-label">
+      <span>Date</span>
+      <span>Name</span>
+    </div>
+    <ul class="article-list">
+      {%- for post in collections.posts | reverse %}
+      <li class="article-list-item">
+        <a href="{{ post.url }}">
+          <span class="list-date">{{ post.data.date | isoDate }}</span>
+          <span class="list-title">{{ post.data.title }}</span>
+        </a>
+      </li>
+      {%- endfor %}
+    </ul>
+  </section>
+</main>
+
+<script src="/gsap-public/minified/gsap.min.js"></script>
+{% raw %}<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const inner = document.querySelector('.hero-line-inner');
+  const mask = document.querySelector('.hero-line-mask');
+
+  if (prefersReducedMotion) {
+    gsap.set(inner, { opacity: 1 });
+    gsap.set(mask, { display: 'none' });
+  } else {
+    gsap.timeline({ delay: 0.42 })
+      .to(mask, { width: '100%', duration: 0.38, ease: 'expo.inOut' })
+      .set(inner, { opacity: 1 }, '>-0.04')
+      .to(mask, { xPercent: 101, duration: 0.45, ease: 'expo.inOut' }, '>-0.02');
+  }
+</script>{% endraw %}

@@ -1,0 +1,65 @@
+---
+layout: base.njk
+ogType: article
+---
+<main class="page">
+  <nav class="article-nav">
+    <a class="back-link" href="/blog/">&larr; Blog</a>
+  </nav>
+
+  <article class="article-page">
+    <header class="article-header">
+      <p class="article-kicker">{{ date | isoDate }}{% if tag %} / {{ tag }}{% endif %}</p>
+      <h1 class="article-title">{{ title }}</h1>
+    </header>
+    <div class="article-body">
+      {{ content | safe }}
+    </div>
+  </article>
+</main>
+
+{% raw %}<script>
+  // Progressive enhancement: wrap each rendered <pre> in code-block chrome
+  // with a language label and a working copy button.
+  (function () {
+    const body = document.querySelector('.article-body');
+    if (!body) return;
+
+    const COPY_ICON =
+      '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+      '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>' +
+      '<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>';
+
+    body.querySelectorAll('pre').forEach((pre) => {
+      const code = pre.querySelector('code');
+      let lang = 'code';
+      if (code) {
+        const langClass = [...code.classList].find((c) => c.startsWith('language-'));
+        if (langClass) lang = langClass.slice('language-'.length);
+      }
+      const block = document.createElement('div');
+      block.className = 'code-block';
+      const header = document.createElement('div');
+      header.className = 'code-header';
+      header.innerHTML = '<span>' + lang + '</span>' +
+        '<button class="copy-button" type="button" aria-label="Copy code" title="Copy code">' + COPY_ICON + '</button>';
+      pre.parentNode.insertBefore(block, pre);
+      block.appendChild(header);
+      block.appendChild(pre);
+    });
+
+    body.querySelectorAll('.copy-button').forEach((button) => {
+      button.addEventListener('click', () => {
+        const code = button.closest('.code-block').querySelector('code').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          button.setAttribute('aria-label', 'Copied');
+          button.title = 'Copied';
+          setTimeout(() => {
+            button.setAttribute('aria-label', 'Copy code');
+            button.title = 'Copy code';
+          }, 1200);
+        });
+      });
+    });
+  })();
+</script>{% endraw %}

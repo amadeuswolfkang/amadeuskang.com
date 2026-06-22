@@ -1,0 +1,27 @@
+{
+  "name": "amadeuskang.com",
+  "version": "1.0.0",
+  "description": "This is the personal website of Amadeus Kang.",
+  "main": "index.js",
+  "scripts": {
+    "build": "eleventy",
+    "serve": "eleventy --serve",
+    "clean": "node -e \"require('fs').rmSync('_site',{recursive:true,force:true})\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amadeuswolfkang/amadeuskang.com.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/amadeuswolfkang/amadeuskang.com/issues"
+  },
+  "homepage": "https://github.com/amadeuswolfkang/amadeuskang.com#readme",
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.6",
+    "@11ty/eleventy-plugin-rss": "^3.0.0"
+  }
+}

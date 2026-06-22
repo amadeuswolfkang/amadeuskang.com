@@ -1,3 +1,5 @@
 CLAUDE.md
 amadeuskang.com.code-workspace
 .DS_Store
+node_modules/
+_site/
