@@ -32,60 +32,38 @@ ogType: article
 
     body.querySelectorAll('pre').forEach((pre) => {
       const code = pre.querySelector('code');
-      let lang = 'code';
-      if (code) {
-        const langClass = [...code.classList].find((c) => c.startsWith('language-'));
-        if (langClass) lang = langClass.slice('language-'.length);
-      }
+      const langClass = code && [...code.classList].find((c) => c.startsWith('language-'));
+      const lang = langClass ? langClass.slice('language-'.length) : 'code';
+
       const block = document.createElement('div');
       block.className = 'code-block';
-      const header = document.createElement('div');
-      header.className = 'code-header';
-      header.innerHTML = '<span>' + lang + '</span>' +
-        '<button class="copy-button" type="button" aria-label="Copy code" title="Copy code">' + COPY_ICON + '</button>';
+      block.innerHTML =
+        '<div class="code-header"><span>' + lang + '</span>' +
+        '<button class="copy-button" type="button" aria-label="Copy code" title="Copy code">' + COPY_ICON + '</button></div>';
       pre.parentNode.insertBefore(block, pre);
-      block.appendChild(header);
       block.appendChild(pre);
-    });
 
-    body.querySelectorAll('.copy-button').forEach((button) => {
+      const button = block.querySelector('.copy-button');
+      const flash = (label) => {
+        button.setAttribute('aria-label', label);
+        button.title = label;
+        setTimeout(() => {
+          button.setAttribute('aria-label', 'Copy code');
+          button.title = 'Copy code';
+        }, 1200);
+      };
       button.addEventListener('click', () => {
-        const code = button.closest('.code-block').querySelector('code').textContent;
-        navigator.clipboard.writeText(code).then(() => {
-          button.setAttribute('aria-label', 'Copied');
-          button.title = 'Copied';
-          setTimeout(() => {
-            button.setAttribute('aria-label', 'Copy code');
-            button.title = 'Copy code';
-          }, 1200);
-        });
-      });
-    });
-  })();
-
-  // Slide-bar hover on the back link, matching the main site nav/card links:
-  // an .is-hovering class held for a 200ms minimum so quick brushes play the
-  // full enter-then-exit arc instead of being interrupted mid-stride.
-  (function () {
-    document.querySelectorAll('.back-link').forEach((link) => {
-      const minDuration = 200;
-      let enteredAt = 0;
-      let pendingRelease = null;
-      link.addEventListener('mouseenter', () => {
-        if (pendingRelease) {
-          clearTimeout(pendingRelease);
-          pendingRelease = null;
+        // navigator.clipboard is undefined outside a secure context and
+        // writeText() rejects if the document isn't focused or permission is
+        // denied — handle both so the click never throws or stalls silently.
+        if (!navigator.clipboard) {
+          flash('Copy unavailable');
+          return;
         }
-        link.classList.add('is-hovering');
-        enteredAt = performance.now();
-      });
-      link.addEventListener('mouseleave', () => {
-        const elapsed = performance.now() - enteredAt;
-        const remaining = Math.max(0, minDuration - elapsed);
-        pendingRelease = setTimeout(() => {
-          link.classList.remove('is-hovering');
-          pendingRelease = null;
-        }, remaining);
+        navigator.clipboard.writeText((code || pre).textContent).then(
+          () => flash('Copied'),
+          () => flash('Copy failed')
+        );
       });
     });
   })();

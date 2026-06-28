@@ -1,5 +1,12 @@
 CLAUDE.md
+TODO.md
 amadeuskang.com.code-workspace
 .DS_Store
 node_modules/
 _site/
+
+# Fonts: only the served .woff2 (and OFL licenses) are committed. Guard against
+# re-introducing source .ttf downloads or vendor READMEs — the woff2 are full
+# lossless copies and can be subset directly, so the .ttf are never needed.
+fonts/**/*.ttf
+fonts/**/README.txt

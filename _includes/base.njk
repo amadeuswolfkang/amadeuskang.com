@@ -21,10 +21,15 @@
 
 <link rel="alternate" type="application/atom+xml" href="{{ site.url }}/feed.xml" title="{{ site.name }} — Blog" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Michroma&family=Victor+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-{% if ogType == 'article' %}<link rel="preload" href="/fonts/Gentium/Gentium-Regular.woff2" as="font" type="font/woff2" crossorigin>{% endif %}
+<!-- Self-hosted fonts (no Google Fonts CDN). Preload only the faces visible
+     above the fold so they're in hand at first paint: Michroma (titles) on every
+     page; Gentium Regular+Bold on articles (body + headings); Exo 2 on the blog
+     index (list/body). All fetched CORS-mode, so crossorigin is required even
+     same-origin. -->
+<link rel="preload" href="/fonts/Michroma/Michroma-Regular.woff2" as="font" type="font/woff2" crossorigin>
+{% if ogType == 'article' %}<link rel="preload" href="/fonts/Gentium/Gentium-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/Gentium/Gentium-Bold.woff2" as="font" type="font/woff2" crossorigin>
+{% else %}<link rel="preload" href="/fonts/Exo_2/Exo2-VariableFont_wght.woff2" as="font" type="font/woff2" crossorigin>{% endif %}
 <script>document.documentElement.classList.add('js');</script>
 
 {% raw %}<style>
@@ -36,28 +41,83 @@
     src: url('/fonts/Gentium/Gentium-Regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
-    font-display: swap;
+    font-display: optional;
   }
   @font-face {
     font-family: 'Gentium';
     src: url('/fonts/Gentium/Gentium-Italic.woff2') format('woff2');
     font-weight: 400;
     font-style: italic;
-    font-display: swap;
+    font-display: optional;
   }
   @font-face {
     font-family: 'Gentium';
     src: url('/fonts/Gentium/Gentium-Bold.woff2') format('woff2');
     font-weight: 700;
     font-style: normal;
-    font-display: swap;
+    font-display: optional;
   }
   @font-face {
     font-family: 'Gentium';
     src: url('/fonts/Gentium/Gentium-BoldItalic.woff2') format('woff2');
     font-weight: 700;
     font-style: italic;
-    font-display: swap;
+    font-display: optional;
+  }
+
+  /* Metric-matched fallback so the Gentium swap causes no layout shift (CLS).
+     Overrides are computed from the two fonts' own metric tables — Gentium's
+     ascent/descent/avg-advance and Georgia's avg-advance (see TODO.md) — the
+     way Capsize/Fontaine do it, so a line of Georgia occupies the same box as
+     Gentium until the real face loads. Tuned to the Regular weight. */
+  @font-face {
+    font-family: 'Gentium Fallback';
+    src: local('Georgia');
+    size-adjust: 93.72%;
+    ascent-override: 101.07%;
+    descent-override: 28.65%;
+    line-gap-override: 0%;
+  }
+
+  /* Self-hosted blog UI/display/mono faces, replacing the former Google Fonts
+     link. Exo 2 and Victor Mono are variable (full weight axis in one file), so
+     no per-weight decision is baked in. font-display:optional → preloaded faces
+     paint correctly from the start, non-preloaded ones fall back for that load
+     without a swap (no flash). */
+  @font-face {
+    font-family: 'Exo 2';
+    src: url('/fonts/Exo_2/Exo2-VariableFont_wght.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: optional;
+  }
+  @font-face {
+    font-family: 'Exo 2';
+    src: url('/fonts/Exo_2/Exo2-Italic-VariableFont_wght.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: optional;
+  }
+  @font-face {
+    font-family: 'Michroma';
+    src: url('/fonts/Michroma/Michroma-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: optional;
+  }
+  @font-face {
+    font-family: 'Victor Mono';
+    src: url('/fonts/Victor_Mono/VictorMono-VariableFont_wght.woff2') format('woff2');
+    font-weight: 100 700;
+    font-style: normal;
+    font-display: optional;
+  }
+  @font-face {
+    font-family: 'Victor Mono';
+    src: url('/fonts/Victor_Mono/VictorMono-Italic-VariableFont_wght.woff2') format('woff2');
+    font-weight: 100 700;
+    font-style: italic;
+    font-display: optional;
   }
 
   :root {
@@ -383,7 +443,7 @@
 
   .article-body {
     padding-top: 2rem;
-    font-family: 'Gentium', serif;
+    font-family: 'Gentium', 'Gentium Fallback', serif;
     font-size: 1.25rem;
     line-height: 1.5;
     color: var(--c-text-1);
@@ -554,5 +614,33 @@
 </svg>
 
 {{ content | safe }}
+
+{% raw %}<script>
+  // Slide-bar hover on every back link, matching the main site nav/card links:
+  // an .is-hovering class held for a 200ms minimum so quick brushes play the
+  // full enter-then-exit arc instead of being interrupted mid-stride. Lives in
+  // the shared shell so the blog index and article pages share one copy.
+  document.querySelectorAll('.back-link').forEach((link) => {
+    const minDuration = 200;
+    let enteredAt = 0;
+    let pendingRelease = null;
+    link.addEventListener('mouseenter', () => {
+      if (pendingRelease) {
+        clearTimeout(pendingRelease);
+        pendingRelease = null;
+      }
+      link.classList.add('is-hovering');
+      enteredAt = performance.now();
+    });
+    link.addEventListener('mouseleave', () => {
+      const elapsed = performance.now() - enteredAt;
+      const remaining = Math.max(0, minDuration - elapsed);
+      pendingRelease = setTimeout(() => {
+        link.classList.remove('is-hovering');
+        pendingRelease = null;
+      }, remaining);
+    });
+  });
+</script>{% endraw %}
 </body>
 </html>
