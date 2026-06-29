@@ -2,7 +2,7 @@
 title: Git Explained
 date: 2026-06-20
 tag: dev
-description: A practical, opinionated tour of Git on workflow, commands, and how to dig yourself out of the scary situations.
+description: A practical tour of Git on workflow, commands, and how to dig yourself out of the scary situations.
 ---
 
 Git is a version control system. It's a history of every change you make to the codebase. You can revert code back to previous versions. Teammates work on the code by splitting the timeline into branches and then merging the branches back into one timeline.
@@ -133,6 +133,4 @@ Git history is permanent. Deleted files remain in all prior commits. If sensitiv
 
 Yes, but I don't allow AI to run destructive Git commands.
 
-I ask Claude to refresh me on commands, but ultimately, I'm the one who enters them. This guards against blindly approving a series of Git operations when I'm too tired or time-pressed.
-
-I once asked Claude if `git clean -fd` could delete all untracked files except one of them. Claude saved a copy of that file as an untracked backup file and deleted all untracked files, including the backup.
+I ask Claude to review commands, but ultimately, I'm the one who enters them. This guards against blindly approving a series of Git operations. I once asked Claude if `git clean -fd` could delete all untracked files except one of them. Claude saved a copy of that file as an untracked backup file and deleted all untracked files, including the backup.

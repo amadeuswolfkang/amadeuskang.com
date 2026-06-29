@@ -66,5 +66,17 @@ ogType: article
         );
       });
     });
+
+    // Make each image open the full file in a new tab (skip ones already linked).
+    body.querySelectorAll('img').forEach((img) => {
+      if (img.closest('a')) return;
+      const link = document.createElement('a');
+      link.href = img.getAttribute('src');
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.className = 'image-link';
+      img.parentNode.insertBefore(link, img);
+      link.appendChild(img);
+    });
   })();
 </script>{% endraw %}

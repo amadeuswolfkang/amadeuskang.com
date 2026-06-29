@@ -581,6 +581,29 @@
     margin-top: 1.5rem;
   }
 
+  /* Markdown wraps a standalone image in its own <p>, so vertical rhythm comes
+     from the sibling-margin rule; the image just stays responsive within the
+     column with a light frame to seat screenshots against the page. */
+  .article-body img,
+  .article-body video {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--c-border);
+    border-radius: 4px;
+  }
+
+  /* Image-as-link wrapper (added client-side): plain block, no text underline,
+     with a subtle border cue on hover that the image opens full-size. */
+  .article-body a.image-link {
+    display: block;
+    text-decoration: none;
+  }
+
+  .article-body a.image-link:hover img {
+    border-color: var(--c-text-2);
+  }
+
   @media (max-width: 480px) {
     .page {
       padding: 4rem 1rem;
