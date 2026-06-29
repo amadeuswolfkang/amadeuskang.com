@@ -11,6 +11,8 @@ description: A few snippets from recent work.
 
 ![Inbox feedback analysis](/img/inbox-feedback-analysis.avif)
 
+![Nukes D3 graph](/img/nukes-d3-graph.avif)
+
 ![Sprigbase example](/img/sprigbase-example.avif)
 
 ![Reboot policy](/img/reboot-policy.avif)
