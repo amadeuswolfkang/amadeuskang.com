@@ -30,7 +30,22 @@ When working on a new feature, you do not work on the main branch. You create a 
 
 ## Pull requests
 
-After you push, you open a pull request. The push must be reviewed and approved before merging.
+After you push, you open a pull request (PR), an official request to merge your changes into main.
+
+When a PR is opened, a code review must be done by a teammate or project owner. The reviewer will check the PR for mistakes you didn't see the first time. If your code is good, they will *merge* it. If your code is shit, they will *request changes* and provide feedback for you to fix it.
+
+### Nit
+
+Your feedback will often have *nits*. A nit is a suggestion to fix a minor issue that doesn't affect functionality. It's usually a typo, naming, or style issue.
+
+Examples include:
+```
+nit: rename `t` to `total`
+nit: unused variable on line 12
+nit: project uses single quotes, not double quotes
+```
+
+You don't have to fix nits, but it's worth considering because it teaches you good coding habits. A nit is how a senior dev politely tells you, "Hey, I noticed this. Here's a better way, but it's your call." Nits are also signals about what makes code legible to your team. Skip nits during crunch time.
 
 ## Commit messages
 
@@ -96,7 +111,7 @@ Git rejects the push if the local branch and the remote branch diverge in commit
 
 ### Rebasing
 
-Merges make Git graphs look messy and illegible. You `git rebase <branch-name>` to make the graph linear. Rebasing makes the graph linear by plucking off a feature branch and then sticking it onto the latest commit. That's why it's called rebasing. It changes the base commit that the branch starts from. Never rebase without coordinating the team. After rebasing, you must force push.
+Merges make Git graphs look messy. You `git rebase <branch-name>` to make the graph linear. Rebasing makes the graph linear by plucking off a feature branch and then sticking it onto the latest commit. That's why it's called rebasing. It changes the base commit that the branch starts from. Never rebase without coordinating the team. After rebasing, you must force push.
 
 ### Amending exposed secrets in Git
 
@@ -133,4 +148,4 @@ Git history is permanent. Deleted files remain in all prior commits. If sensitiv
 
 Yes, but I don't allow AI to run destructive Git commands.
 
-I ask Claude to review commands, but ultimately, I'm the one who enters them. This guards against blindly approving a series of Git operations. I once asked Claude if `git clean -fd` could delete all untracked files except one of them. Claude saved a copy of that file as an untracked backup file and deleted all untracked files, including the backup.
+I ask Claude to review commands, but ultimately, I'm the one who enters them. This guards against blindly approving a series of Git operations. I once asked Claude if `git clean -fd` could delete all untracked files except one. Claude saved an untracked copy of that file and deleted all untracked files, including the copy.

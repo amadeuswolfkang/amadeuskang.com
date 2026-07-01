@@ -18,6 +18,39 @@ export default function (eleventyConfig) {
     return d.toISOString().slice(0, 10);
   });
 
+  // Give article section headings (h2–h4) stable slug ids at build time, so a
+  // shared `…/#section` deep link resolves on first paint (before any JS). The
+  // copy-link affordance itself is layered on client-side in article.njk. Hand-
+  // rolled rather than pulling in markdown-it-anchor — we only need the id, and
+  // the slug + collision handling is a few lines.
+  eleventyConfig.amendLibrary("md", (md) => {
+    const slugify = (text) =>
+      text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "") // drop punctuation (incl. inline-code backticks)
+        .replace(/\s+/g, "-") // spaces → hyphens
+        .replace(/-+/g, "-") // collapse runs
+        .replace(/^-|-$/g, ""); // trim edges
+
+    md.core.ruler.push("heading_ids", (state) => {
+      const seen = new Map();
+      const tokens = state.tokens;
+      for (let i = 0; i < tokens.length; i++) {
+        const open = tokens[i];
+        if (open.type !== "heading_open") continue;
+        if (!["h2", "h3", "h4"].includes(open.tag)) continue;
+        const inline = tokens[i + 1];
+        let slug = slugify(inline && inline.type === "inline" ? inline.content : "");
+        if (!slug) continue;
+        const n = seen.get(slug) || 0;
+        seen.set(slug, n + 1);
+        if (n > 0) slug = `${slug}-${n + 1}`; // de-dupe repeats: foo, foo-2, foo-3
+        open.attrSet("id", slug);
+      }
+    });
+  });
+
   // Atom feed generated from the posts collection.
   eleventyConfig.addPlugin(feedPlugin, {
     type: "atom",

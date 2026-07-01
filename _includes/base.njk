@@ -27,6 +27,7 @@
      index (list/body). All fetched CORS-mode, so crossorigin is required even
      same-origin. -->
 <link rel="preload" href="/fonts/Michroma/Michroma-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/Victor_Mono/VictorMono-VariableFont_wght.woff2" as="font" type="font/woff2" crossorigin>
 {% if ogType == 'article' %}<link rel="preload" href="/fonts/Gentium/Gentium-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/Gentium/Gentium-Bold.woff2" as="font" type="font/woff2" crossorigin>
 {% else %}<link rel="preload" href="/fonts/Exo_2/Exo2-VariableFont_wght.woff2" as="font" type="font/woff2" crossorigin>{% endif %}
@@ -131,20 +132,21 @@
     --c-code-bg: #e7e3df;
     --c-code-text: #2c292b;
     --c-code-meta: #5b5658;
-    --c-code-button-bg: #cbc5c0;
-    --c-code-button-text: #2c292b;
     --mesh-1: rgba(44, 41, 43, 0.04);
     --mesh-2: rgba(120, 116, 118, 0.06);
     --mesh-3: rgba(147, 148, 154, 0.07);
     --mesh-4: rgba(90, 86, 88, 0.06);
     --mesh-5: rgba(44, 41, 43, 0.05);
-    --text-xs: 0.875rem;
-    --text-sm: 0.9375rem;
-    --text-md: 1.125rem;
-    --text-lg: 1.5rem;
-    --text-xl: clamp(2.5rem, 8vw, 4.5rem);
-    --mono-xs: 0.8125rem;
-    --mono-sm: 0.875rem;
+    /* Type scale — major third (1.25×), anchored at the 20px reading body
+       (--text-md). Each rung is 1.25 the previous, except --text-xs (bumped to
+       14px for legibility) and the display step (a hand-tuned clamp). One scale
+       for everything (reading + labels). */
+    --text-xs: 0.875rem; /* 14px    · labels, dates, kicker, h5, code (hand-tuned up from the 1.25 step) */
+    --text-sm: 1rem; /* 16px   · h4 */
+    --text-md: 1.25rem; /* 20px   · reading body */
+    --text-lg: 1.5625rem; /* 25px   · h3, list-title */
+    --text-xl: 1.9531rem; /* ~31px  · h2 */
+    --text-2xl: clamp(2.5rem, 6vw, 3.7rem); /* 40→59px · page & article titles */
   }
 
   *, *::before, *::after {
@@ -204,6 +206,16 @@
     position: relative;
   }
 
+  /* Bare footer — empty for now, just reserves space at the bottom of every
+     blog page (aligned to the same column as .page). Content added later. */
+  .site-footer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    border-top: 1px solid var(--c-border);
+    min-height: 10rem;
+  }
+
   /* ----- Blog index header ----- */
   .site-header {
     padding-bottom: 2.5rem;
@@ -212,7 +224,7 @@
 
   .site-title {
     font-family: 'Michroma', sans-serif;
-    font-size: var(--text-xl);
+    font-size: var(--text-2xl);
     font-weight: 400;
     line-height: 1.05;
     letter-spacing: -0.04em;
@@ -312,7 +324,7 @@
 
   .list-date {
     font-family: 'Victor Mono', monospace;
-    font-size: var(--text-sm);
+    font-size: var(--text-xs);
     color: var(--c-text-2);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
@@ -332,7 +344,7 @@
   .back-link {
     display: inline-block;
     font-family: 'Victor Mono', monospace;
-    font-size: var(--text-sm);
+    font-size: var(--text-xs);
     color: var(--c-text-2);
     text-decoration: none;
     position: relative;
@@ -374,7 +386,7 @@
     align-items: baseline;
     padding: 0.5rem 0.75rem;
     color: var(--c-code-meta);
-    font-size: var(--mono-sm);
+    font-size: var(--text-xs);
     font-variant-numeric: tabular-nums;
   }
 
@@ -385,11 +397,19 @@
     height: 1.75rem;
     border: 0;
     padding: 0;
-    background: var(--c-code-button-bg);
-    color: var(--c-code-button-text);
+    background: none;
+    color: var(--c-text-2); /* muted at rest, matching the heading anchors */
+    opacity: 0.4; /* softened at rest; full opacity on hover, like the anchors */
     font: inherit;
     border-radius: 4px;
     cursor: pointer;
+    transition: color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .copy-button:hover,
+  .copy-button:focus-visible {
+    color: var(--c-text-1);
+    opacity: 1;
   }
 
   .copy-button svg {
@@ -403,7 +423,7 @@
     padding: 1rem 0.75rem;
     overflow-x: auto;
     color: var(--c-code-text);
-    font-size: var(--mono-sm);
+    font-size: var(--text-xs);
     line-height: 1.55;
     tab-size: 2;
   }
@@ -413,10 +433,89 @@
   }
 
   /* ----- Article ----- */
+  /* Shell holds the reading column and positions the ToC in the right margin.
+     It IS the 760px centred column, so the ToC (absolute, left:100%) sits in the
+     margin without shifting the reading column off-centre. */
+  .article-shell {
+    position: relative;
+    max-width: 760px;
+    margin-inline: auto;
+  }
+
   .article-page {
     max-width: 760px;
     margin-inline: auto;
     padding-top: 2.5rem;
+  }
+
+  /* ----- Table of contents (right margin, wide screens only) ----- */
+  .article-toc {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 100%;
+    width: 13rem;
+    margin-left: 2rem;
+  }
+
+  /* Inner sticks while scrolling and stops at the article's end (bounded by the
+     absolute aside, which stretches to the shell height via top:0/bottom:0). */
+  .toc-inner {
+    position: sticky;
+    top: 2.5rem;
+    max-height: calc(100vh - 5rem);
+    overflow-y: auto;
+  }
+
+  .toc-title {
+    margin: 0 0 0.75rem;
+    font-family: 'Gentium', 'Gentium Fallback', serif;
+    font-size: var(--text-md);
+    color: var(--c-text-2);
+  }
+
+  /* Nested indent guides: each list level carries its own left rail, so depth
+     reads as "how many rails deep" an item sits. Real nested <ul>s (built in
+     article.njk) rather than faked lines, so the rails are continuous. */
+  .toc-list,
+  .toc-sublist {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 0.85rem;
+    border-left: 2px solid var(--c-border);
+  }
+
+  .toc-link {
+    display: block;
+    font-family: 'Gentium', 'Gentium Fallback', serif;
+    font-size: var(--text-md);
+    line-height: 1.5;
+    color: var(--c-text-2);
+    text-decoration: none;
+    /* Hanging indent: a long entry's wrapped lines indent under its first line,
+       so it reads as one item, not two. The margin adds proximity grouping —
+       lines within an entry sit closer than the gap between entries. */
+    padding-left: 1em;
+    text-indent: -1em;
+    margin-bottom: 0.4rem;
+    transition: color 0.2s ease;
+  }
+
+  .toc-link:hover,
+  .toc-link:focus-visible {
+    color: var(--c-text-1);
+  }
+
+  .toc-link.is-active {
+    color: var(--c-text-1);
+    font-weight: 700;
+  }
+
+  /* Not enough right margin below this width — hide rather than crowd. */
+  @media (max-width: 1280px) {
+    .article-toc {
+      display: none;
+    }
   }
 
   .article-header {
@@ -434,7 +533,7 @@
   .article-title {
     margin-top: 0.5rem;
     font-family: 'Michroma', sans-serif;
-    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-size: var(--text-2xl);
     font-weight: 400;
     line-height: 1.05;
     letter-spacing: -0.03em;
@@ -444,7 +543,7 @@
   .article-body {
     padding-top: 2rem;
     font-family: 'Gentium', 'Gentium Fallback', serif;
-    font-size: 1.25rem;
+    font-size: var(--text-md);
     line-height: 1.5;
     color: var(--c-text-1);
   }
@@ -462,7 +561,7 @@
 
   .article-body h2 {
     margin-top: 3.5rem;
-    font-size: clamp(1.75rem, 3vw, 2.375rem);
+    font-size: var(--text-xl);
     font-weight: 700;
     line-height: 1.1;
     letter-spacing: -0.03em;
@@ -470,7 +569,7 @@
 
   .article-body h3 {
     margin-top: 2.5rem;
-    font-size: 1.375rem;
+    font-size: var(--text-lg);
     font-weight: 700;
     line-height: 1.2;
     letter-spacing: -0.02em;
@@ -478,7 +577,7 @@
 
   .article-body h4 {
     margin-top: 1.75rem;
-    font-size: 1.0625rem;
+    font-size: var(--text-sm);
     font-weight: 700;
   }
 
@@ -546,7 +645,7 @@
   .article-body a {
     color: var(--c-text-1);
     text-decoration: underline;
-    text-decoration-color: var(--c-border);
+    text-decoration-color: var(--c-text-2);
     text-underline-offset: 0.15em;
     transition: text-decoration-color 0.2s ease;
   }
@@ -604,6 +703,97 @@
     border-color: var(--c-text-2);
   }
 
+  /* Breathing room when a #section deep link lands: the heading sits a bit below
+     the viewport top instead of flush against it. Pure scroll behaviour — does
+     not affect document layout. (Wikipedia does the same via scroll offset.) */
+  .article-body :is(h2, h3, h4) {
+    scroll-margin-top: 2rem;
+  }
+
+  /* Section copy-link icon (added client-side): a chain-link glyph at the end of
+     each heading, always visible in the faintest palette colour and brightening
+     on hover/focus. On copy it crossfades to a checkmark that draws itself in —
+     stroke-dashoffset animated via the path's pathLength="1", no measuring. */
+  .article-body :is(h2, h3, h4) .heading-anchor {
+    position: relative;
+    display: inline-block;
+    /* rem (not em) → same icon size on every heading, and it stays within the
+       line box so it never shifts layout. */
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: 0.5em;
+    /* `middle` centres on the x-height; headings read from their cap-height, so
+       nudge up to the optical centre. em → scales with each heading; transform →
+       no line-box change, so still no layout shift. */
+    vertical-align: middle;
+    transform: translateY(-0.1em);
+    color: var(--c-text-2); /* muted at rest — readable, darkens on hover */
+    opacity: 0.4; /* softened at rest; full opacity on hover. On the anchor (not
+                     the SVGs) so it doesn't fight the link↔check crossfade. */
+    text-decoration: none;
+    transition: color 0.2s ease, opacity 0.2s ease;
+  }
+
+  /* Expanded hit target: comfortable to click/tap without enlarging the glyph
+     or touching layout (absolute → out of flow). */
+  .article-body :is(h2, h3, h4) .heading-anchor::after {
+    content: "";
+    position: absolute;
+    inset: -0.5rem;
+  }
+
+  /* Brighten on hover/focus. Scoped under the heading so it outranks the generic
+     `.article-body a` link rules above. */
+  .article-body :is(h2, h3, h4) .heading-anchor:hover,
+  .article-body :is(h2, h3, h4) .heading-anchor:focus-visible {
+    color: var(--c-text-1);
+    opacity: 1;
+  }
+
+  .heading-anchor svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: opacity 0.2s ease;
+  }
+
+  /* Check starts hidden + undrawn, in the accent color. */
+  .heading-anchor .icon-check {
+    opacity: 0;
+    color: var(--c-accent);
+  }
+
+  .heading-anchor .icon-check path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.35s ease;
+  }
+
+  /* On success: link fades out, check fades in and draws. */
+  .heading-anchor.is-copied .icon-link {
+    opacity: 0;
+  }
+
+  .heading-anchor.is-copied .icon-check {
+    opacity: 1;
+  }
+
+  .heading-anchor.is-copied .icon-check path {
+    stroke-dashoffset: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .heading-anchor .icon-check path {
+      transition: none;
+    }
+  }
+
   @media (max-width: 480px) {
     .page {
       padding: 4rem 1rem;
@@ -637,6 +827,8 @@
 </svg>
 
 {{ content | safe }}
+
+<footer class="site-footer"></footer>
 
 {% raw %}<script>
   // Slide-bar hover on every back link, matching the main site nav/card links:

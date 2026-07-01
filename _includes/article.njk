@@ -7,76 +7,241 @@ ogType: article
     <a class="back-link" href="/blog/">&larr; Blog</a>
   </nav>
 
-  <article class="article-page">
-    <header class="article-header">
-      <p class="article-kicker">{{ date | isoDate }}{% if tag %} / {{ tag }}{% endif %}</p>
-      <h1 class="article-title">{{ title }}</h1>
-    </header>
-    <div class="article-body">
-      {{ content | safe }}
-    </div>
-  </article>
+  <div class="article-shell">
+    <article class="article-page">
+      <header class="article-header">
+        <p class="article-kicker">{{ date | isoDate }}{% if tag %} / {{ tag }}{% endif %}</p>
+        <h1 class="article-title">{{ title }}</h1>
+      </header>
+      <div class="article-body">
+        {{ content | safe }}
+      </div>
+    </article>
+    <aside class="article-toc" aria-label="Table of contents" hidden></aside>
+  </div>
 </main>
 
 {% raw %}<script>
-  // Progressive enhancement: wrap each rendered <pre> in code-block chrome
-  // with a language label and a working copy button.
+  // Progressive enhancement for the rendered article body. Each feature is a
+  // self-contained pass; the orchestration at the bottom shows the run order.
   (function () {
     const body = document.querySelector('.article-body');
     if (!body) return;
 
-    const COPY_ICON =
-      '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-      '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>' +
-      '<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>';
+    // Wrap each rendered <pre> in code-block chrome: a language label and a
+    // working copy button.
+    function enhanceCodeBlocks() {
+      const COPY_ICON =
+        '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+        '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>' +
+        '<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>';
 
-    body.querySelectorAll('pre').forEach((pre) => {
-      const code = pre.querySelector('code');
-      const langClass = code && [...code.classList].find((c) => c.startsWith('language-'));
-      const lang = langClass ? langClass.slice('language-'.length) : 'code';
+      body.querySelectorAll('pre').forEach((pre) => {
+        const code = pre.querySelector('code');
+        const langClass = code && [...code.classList].find((c) => c.startsWith('language-'));
+        const lang = langClass ? langClass.slice('language-'.length) : 'code';
 
-      const block = document.createElement('div');
-      block.className = 'code-block';
-      block.innerHTML =
-        '<div class="code-header"><span>' + lang + '</span>' +
-        '<button class="copy-button" type="button" aria-label="Copy code" title="Copy code">' + COPY_ICON + '</button></div>';
-      pre.parentNode.insertBefore(block, pre);
-      block.appendChild(pre);
+        const block = document.createElement('div');
+        block.className = 'code-block';
+        block.innerHTML =
+          '<div class="code-header"><span>' + lang + '</span>' +
+          '<button class="copy-button" type="button" aria-label="Copy code" title="Copy code">' + COPY_ICON + '</button></div>';
+        pre.parentNode.insertBefore(block, pre);
+        block.appendChild(pre);
 
-      const button = block.querySelector('.copy-button');
-      const flash = (label) => {
-        button.setAttribute('aria-label', label);
-        button.title = label;
-        setTimeout(() => {
-          button.setAttribute('aria-label', 'Copy code');
-          button.title = 'Copy code';
-        }, 1200);
-      };
-      button.addEventListener('click', () => {
-        // navigator.clipboard is undefined outside a secure context and
-        // writeText() rejects if the document isn't focused or permission is
-        // denied — handle both so the click never throws or stalls silently.
-        if (!navigator.clipboard) {
-          flash('Copy unavailable');
-          return;
-        }
-        navigator.clipboard.writeText((code || pre).textContent).then(
-          () => flash('Copied'),
-          () => flash('Copy failed')
-        );
+        const button = block.querySelector('.copy-button');
+        const flash = (label) => {
+          button.setAttribute('aria-label', label);
+          button.title = label;
+          setTimeout(() => {
+            button.setAttribute('aria-label', 'Copy code');
+            button.title = 'Copy code';
+          }, 1200);
+        };
+        button.addEventListener('click', () => {
+          // navigator.clipboard is undefined outside a secure context and
+          // writeText() rejects if the document isn't focused or permission is
+          // denied — handle both so the click never throws or stalls silently.
+          if (!navigator.clipboard) {
+            flash('Copy unavailable');
+            return;
+          }
+          navigator.clipboard.writeText((code || pre).textContent).then(
+            () => flash('Copied'),
+            () => flash('Copy failed')
+          );
+        });
       });
-    });
+    }
 
     // Make each image open the full file in a new tab (skip ones already linked).
-    body.querySelectorAll('img').forEach((img) => {
-      if (img.closest('a')) return;
-      const link = document.createElement('a');
-      link.href = img.getAttribute('src');
-      link.target = '_blank';
-      link.rel = 'noopener';
-      link.className = 'image-link';
-      img.parentNode.insertBefore(link, img);
-      link.appendChild(img);
-    });
+    function linkifyImages() {
+      body.querySelectorAll('img').forEach((img) => {
+        if (img.closest('a')) return;
+        const link = document.createElement('a');
+        link.href = img.getAttribute('src');
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.className = 'image-link';
+        img.parentNode.insertBefore(link, img);
+        link.appendChild(img);
+      });
+    }
+
+    // Section copy-links: a chain-link icon at the end of each heading (ids are
+    // injected at build time) that copies a direct URL to that section. Success
+    // is confirmed by swapping to a checkmark that draws itself in.
+    function addHeadingAnchors(headings) {
+      const LINK_ICON =
+        '<svg class="icon-link" viewBox="0 0 24 24" aria-hidden="true">' +
+        '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>' +
+        '<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>';
+      const CHECK_ICON =
+        // Path starts at the left arm so the stroke draws left-to-right (the
+        // natural direction a check is written); same shape as Feather's check.
+        '<svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true">' +
+        '<path pathLength="1" d="M4 12 9 17 20 6"></path></svg>';
+
+      headings.forEach((heading) => {
+        const anchor = document.createElement('a');
+        anchor.className = 'heading-anchor';
+        anchor.href = '#' + heading.id;
+        anchor.setAttribute('aria-label', 'Copy link to this section');
+        anchor.title = 'Copy link to section';
+        anchor.innerHTML = LINK_ICON + CHECK_ICON;
+        heading.appendChild(anchor);
+
+        let revert = null;
+        anchor.addEventListener('click', (e) => {
+          e.preventDefault();
+          const url = location.href.split('#')[0] + '#' + heading.id;
+          const confirm = () => {
+            anchor.classList.add('is-copied');
+            if (revert) clearTimeout(revert);
+            revert = setTimeout(() => anchor.classList.remove('is-copied'), 1200);
+          };
+          // No clipboard (insecure context) → at least put it in the address bar.
+          if (!navigator.clipboard) {
+            location.hash = heading.id;
+            return;
+          }
+          navigator.clipboard.writeText(url).then(confirm, () => {
+            location.hash = heading.id;
+          });
+        });
+      });
+    }
+
+    // Table of contents (shown in the right margin on wide screens; hidden via
+    // CSS on narrow ones). Built from the same h2/h3/h4[id] set, with scroll-spy
+    // highlighting whichever section is currently near the top of the viewport.
+    function buildTableOfContents(headings) {
+      const toc = document.querySelector('.article-toc');
+      if (!toc || headings.length < 2) return;
+
+      const inner = document.createElement('div');
+      inner.className = 'toc-inner';
+      const title = document.createElement('p');
+      title.className = 'toc-title';
+      title.textContent = 'On this page';
+      const list = document.createElement('ul');
+      list.className = 'toc-list';
+
+      // Build a nested <ul> tree from the flat h2/h3/h4 sequence so each depth
+      // gets its own rail. A stack tracks the open list at each level; child
+      // <ul>s are created lazily so a level with no children adds no empty rail.
+      const linkById = new Map();
+      const levelOf = (h) => parseInt(h.tagName.charAt(1), 10);
+      const stack = [{ level: 1, ul: list, li: null }];
+      headings.forEach((heading) => {
+        const level = levelOf(heading);
+        while (stack.length > 1 && stack[stack.length - 1].level >= level) stack.pop();
+        const top = stack[stack.length - 1];
+        if (!top.ul) {
+          top.ul = document.createElement('ul');
+          top.ul.className = 'toc-sublist';
+          top.li.appendChild(top.ul);
+        }
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.className = 'toc-link';
+        a.href = '#' + heading.id;
+        // textContent excludes the appended anchor icon (SVGs carry no text).
+        a.textContent = heading.textContent.trim();
+        li.appendChild(a);
+        top.ul.appendChild(li);
+        linkById.set(heading.id, a);
+        stack.push({ level: level, ul: null, li: li });
+      });
+
+      inner.appendChild(title);
+      inner.appendChild(list);
+      toc.appendChild(inner);
+      toc.hidden = false;
+
+      // Highlight the section nearest the top. rootMargin pulls the observation
+      // band to the top ~25% of the viewport; the last heading to cross it wins,
+      // and the highlight persists through long sections with no heading in band.
+      let activeId = null;
+      const setActive = (id) => {
+        if (id === activeId) return;
+        const prev = activeId && linkById.get(activeId);
+        if (prev) prev.classList.remove('is-active');
+        activeId = id;
+        const link = linkById.get(id);
+        if (link) link.classList.add('is-active');
+      };
+      // Fraction of the viewport height, measured from the top, that counts as
+      // the "active" zone. Used by both the observer's rootMargin and the
+      // at-rest seed below — keep them driven by this one value.
+      const ACTIVE_BAND = 0.25;
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) setActive(entry.target.id);
+          });
+        },
+        { rootMargin: `0px 0px -${(1 - ACTIVE_BAND) * 100}% 0px`, threshold: 0 }
+      );
+      headings.forEach((heading) => observer.observe(heading));
+
+      // Seed the highlight for the at-rest state: the observer only fires on
+      // intersection changes, so without this nothing is highlighted on load
+      // when the first heading starts below the top band (e.g. an intro para
+      // precedes it) or after a deep-link jump. Pick the last heading at/above
+      // the band's lower edge, defaulting to the first.
+      const seedActive = () => {
+        const band = window.innerHeight * ACTIVE_BAND;
+        let current = headings[0];
+        for (const heading of headings) {
+          if (heading.getBoundingClientRect().top <= band) current = heading;
+          else break;
+        }
+        setActive(current.id);
+      };
+      seedActive();
+
+      // A short last section can't scroll far enough to push its heading into
+      // the top band, so the observer never activates it. When the page bottoms
+      // out, force the last entry active; scrolling back up lets the observer
+      // take over again.
+      const lastId = headings[headings.length - 1].id;
+      window.addEventListener(
+        'scroll',
+        () => {
+          const scrolled = window.innerHeight + window.scrollY;
+          if (scrolled >= document.documentElement.scrollHeight - 2) setActive(lastId);
+        },
+        { passive: true }
+      );
+    }
+
+    // Run the passes. Anchors are added before the ToC reads heading text; the
+    // appended icon is text-free, so entry labels stay clean regardless.
+    const headings = body.querySelectorAll('h2[id], h3[id], h4[id]');
+    enhanceCodeBlocks();
+    linkifyImages();
+    addHeadingAnchors(headings);
+    buildTableOfContents(headings);
   })();
 </script>{% endraw %}
