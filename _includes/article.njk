@@ -179,9 +179,6 @@ ogType: article
       toc.appendChild(inner);
       toc.hidden = false;
 
-      // Highlight the section nearest the top. rootMargin pulls the observation
-      // band to the top ~25% of the viewport; the last heading to cross it wins,
-      // and the highlight persists through long sections with no heading in band.
       let activeId = null;
       const setActive = (id) => {
         if (id === activeId) return;
@@ -191,35 +188,46 @@ ogType: article
         const link = linkById.get(id);
         if (link) link.classList.add('is-active');
       };
+
       // Fraction of the viewport height, measured from the top, that counts as
-      // the "active" zone. Used by both the observer's rootMargin and the
-      // at-rest seed below — keep them driven by this one value.
+      // the "active" zone. Drives both the observer's rootMargin and the
+      // position scan below — keep them driven by this one value.
       const ACTIVE_BAND = 0.25;
+
+      // The section you're "on": the TOPMOST heading whose top edge sits inside
+      // the band. Topmost, not lowest — after a click/deep-link jump the target
+      // heading and the next one can both land in the band, and the target is
+      // the upper of the two. Headings are in document order, so their tops
+      // increase down the page: skip the ones scrolled above the top, return the
+      // first one inside the band, and stop once we pass below it. When nothing
+      // is in the band (deep inside a long section) fall back to the last
+      // heading scrolled above the top, then to the first heading — so a reload
+      // mid-article still highlights the current section, not section one.
+      const activeCandidate = () => {
+        const bandBottom = window.innerHeight * ACTIVE_BAND;
+        let aboveBand = null;
+        for (const heading of headings) {
+          const top = heading.getBoundingClientRect().top;
+          if (top > bandBottom) break;
+          if (top >= 0) return heading.id;
+          aboveBand = heading;
+        }
+        return (aboveBand || headings[0]).id;
+      };
+
+      // Recompute on every band crossing. The observer fires exactly when a
+      // heading enters or leaves the top band — the only moments the answer can
+      // change — and the highlight rightly persists between those events.
       const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) setActive(entry.target.id);
-          });
-        },
+        () => setActive(activeCandidate()),
         { rootMargin: `0px 0px -${(1 - ACTIVE_BAND) * 100}% 0px`, threshold: 0 }
       );
       headings.forEach((heading) => observer.observe(heading));
 
-      // Seed the highlight for the at-rest state: the observer only fires on
-      // intersection changes, so without this nothing is highlighted on load
-      // when the first heading starts below the top band (e.g. an intro para
-      // precedes it) or after a deep-link jump. Pick the last heading at/above
-      // the band's lower edge, defaulting to the first.
-      const seedActive = () => {
-        const band = window.innerHeight * ACTIVE_BAND;
-        let current = headings[0];
-        for (const heading of headings) {
-          if (heading.getBoundingClientRect().top <= band) current = heading;
-          else break;
-        }
-        setActive(current.id);
-      };
-      seedActive();
+      // Seed the at-rest highlight: the observer only fires on changes, so on
+      // load (or after a deep-link jump) nothing is highlighted until something
+      // crosses the band.
+      setActive(activeCandidate());
 
       // A short last section can't scroll far enough to push its heading into
       // the top band, so the observer never activates it. When the page bottoms
