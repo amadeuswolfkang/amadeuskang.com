@@ -5,7 +5,7 @@ tag: dev
 description: A practical tour of Git on workflow, commands, and how to dig yourself out of the scary situations.
 ---
 
-Git is a version control system. It's a history of every change you make to the codebase. You can revert code back to previous versions. Teammates work on the code by splitting the timeline into branches and then merging the branches back into one timeline.
+Git is a version control system. It's a history of every change you make to the codebase. You can revert code to previous versions. Teammates work on the code by splitting the timeline into branches and then merging the branches back into one timeline.
 
 - **GitHub:** the site that hosts git repositories.
     - **remote:** existing on GitHub.
@@ -49,10 +49,16 @@ You don't have to fix nits, but it's worth considering because it teaches you go
 
 ## Commit messages
 
-The tense for commit messages is present imperative; they're written in the same tense as commands like `git pull` and `git merge`. The message says what the change *does* to the codebase, not what it *did*.
+A commit message is a short description of the change you made to the code. Every commit should be an atomic change, even if it's just one line. Don't overload a commit with multiple features.
 
-- `Fixed login button` is wrong.
-- `Fix login button` is correct.
+`Fix homepage typo` is a clear commit message. But if you fix three bugs, add dark mode, and refactor the navbar in one commit, there's no way to encapsulate that in a single message. It makes pull requests too complex to review.
+
+### Commit style
+
+Commit messages are written in the imperative mood; they use the same form as commands like `git pull` and `git merge`. The message says what the change *does* to the codebase, not what it *did*.
+
+(1) `Added login button` is wrong.
+(2) `Add login button` is correct.
 
 ## Basic commands
 
@@ -89,7 +95,7 @@ Older Git users don't use switch or restore; they use `git checkout`. It's overl
 
 A merge conflict is when 2 people edit the same line of code. The edits overlap and Git must pick one to take priority.
 
-To resolve it, you either (1) accept the current, (2) accept the incoming, or (3) both. Accepting both literally concatenates the code for you to figure out later. Make the right decision by reading the code and asking your teammates why they made the edit.
+To resolve it, you (1) accept the current, (2) accept the incoming, or (3) both. Accepting both will concatenate the code for you to figure out later. Make the right decision by reading the code and asking your teammates why they made the edit.
 
 ## Destructive changes
 
@@ -102,7 +108,7 @@ Overwrite the remote repo's history with your local repo's history.
 
 ### Should I force push?
 
-Git rejects the push if the local branch and the remote branch diverge in commit history. It causes `git error: failed to push some refs to`.
+Git rejects the push if the local branch and the remote branch diverge in commit history. It causes `error: failed to push some refs to`.
 
 1. **Parallel commits.** Your teammate pushed to the remote branch, and now your local branch is behind. To fix, `git pull`.
 2. **Rewritten history.** You rebased or amended a commit that was already pushed. This rewrites your local commit history, diverging it from the remote branch.
@@ -111,7 +117,7 @@ Git rejects the push if the local branch and the remote branch diverge in commit
 
 ### Rebasing
 
-Merges make Git graphs look messy. You `git rebase <branch-name>` to make the graph linear. Rebasing makes the graph linear by plucking off a feature branch and then sticking it onto the latest commit. That's why it's called rebasing. It changes the base commit that the branch starts from. Never rebase without coordinating the team. After rebasing, you must force push.
+Merge commits clutter the Git graph. You `git rebase <branch-name>` to keep it linear by replaying your commits onto the tip of the target branch. This changes the base commit your branch starts from. If you've already pushed the branch, you'll need to force push after rebasing. Don't rebase commits others are working on.
 
 ### Amending exposed secrets in Git
 
@@ -141,7 +147,7 @@ Git history is permanent. Deleted files remain in all prior commits. If sensitiv
 2. Add the file to `.gitignore`: `echo "<filename>/" >> .gitignore`
 3. Stop tracking the file: `git rm -r --cached <filename>`
 4. Commit: `git commit -m "stop tracking <filename>"`
-5. Clean the file out of history with [git-filter-repo](https://github.com/newren/git-filter-repo), a Python tool: `git filter-repo --sensitive-data-removal --invert-paths --path <filename>`
+5. Clean the file out of history with [git-filter-repo](https://github.com/newren/git-filter-repo): `git filter-repo --invert-paths --path <filename>`
 6. Force push. Teammates must re-clone after the force push: `git push --force`
 
 ## Can AI run Git commands?

@@ -61,7 +61,7 @@ ogType: article
         button.addEventListener('click', () => {
           // navigator.clipboard is undefined outside a secure context and
           // writeText() rejects if the document isn't focused or permission is
-          // denied — handle both so the click never throws or stalls silently.
+          // denied. Handle both so the click never throws or stalls silently.
           if (!navigator.clipboard) {
             flash('Copy unavailable');
             return;
@@ -152,9 +152,13 @@ ogType: article
       // <ul>s are created lazily so a level with no children adds no empty rail.
       const linkById = new Map();
       const levelOf = (h) => parseInt(h.tagName.charAt(1), 10);
+      // Sentinel at level 1 (shallower than any h2) so the root list is always
+      // the parent for top-level headings and the pop loop below never empties.
       const stack = [{ level: 1, ul: list, li: null }];
       headings.forEach((heading) => {
         const level = levelOf(heading);
+        // Pop siblings and deeper entries so the stack top is this heading's
+        // nearest shallower ancestor: the list it should be appended under.
         while (stack.length > 1 && stack[stack.length - 1].level >= level) stack.pop();
         const top = stack[stack.length - 1];
         if (!top.ul) {
@@ -191,18 +195,18 @@ ogType: article
 
       // Fraction of the viewport height, measured from the top, that counts as
       // the "active" zone. Drives both the observer's rootMargin and the
-      // position scan below — keep them driven by this one value.
+      // position scan below; keep them driven by this one value.
       const ACTIVE_BAND = 0.25;
 
       // The section you're "on": the TOPMOST heading whose top edge sits inside
-      // the band. Topmost, not lowest — after a click/deep-link jump the target
-      // heading and the next one can both land in the band, and the target is
-      // the upper of the two. Headings are in document order, so their tops
-      // increase down the page: skip the ones scrolled above the top, return the
-      // first one inside the band, and stop once we pass below it. When nothing
-      // is in the band (deep inside a long section) fall back to the last
-      // heading scrolled above the top, then to the first heading — so a reload
-      // mid-article still highlights the current section, not section one.
+      // the band. Topmost, not lowest. After a click or deep-link jump the
+      // target heading and the next one can both land in the band, and the
+      // target is the upper of the two. Headings are in document order, so their
+      // tops increase down the page: skip the ones scrolled above the top,
+      // return the first one inside the band, and stop once we pass below it.
+      // When nothing is in the band (deep inside a long section) fall back to the
+      // last heading scrolled above the top, then to the first heading, so a
+      // reload mid-article still highlights the current section, not section one.
       const activeCandidate = () => {
         const bandBottom = window.innerHeight * ACTIVE_BAND;
         let aboveBand = null;
@@ -215,9 +219,9 @@ ogType: article
         return (aboveBand || headings[0]).id;
       };
 
-      // Recompute on every band crossing. The observer fires exactly when a
-      // heading enters or leaves the top band — the only moments the answer can
-      // change — and the highlight rightly persists between those events.
+      // Recompute on every band crossing. The observer fires only when a heading
+      // enters or leaves the top band, the exact moments the answer can change;
+      // the highlight rightly persists between those events.
       const observer = new IntersectionObserver(
         () => setActive(activeCandidate()),
         { rootMargin: `0px 0px -${(1 - ACTIVE_BAND) * 100}% 0px`, threshold: 0 }
@@ -238,6 +242,7 @@ ogType: article
         'scroll',
         () => {
           const scrolled = window.innerHeight + window.scrollY;
+          // 2px of slack absorbs sub-pixel rounding so "at the bottom" still trips.
           if (scrolled >= document.documentElement.scrollHeight - 2) setActive(lastId);
         },
         { passive: true }
