@@ -32,7 +32,7 @@ When working on a new feature, you do not work on the main branch. You create a 
 
 After you push, you open a pull request (PR), an official request to merge your changes into main.
 
-When a PR is opened, a code review must be done by a teammate or project owner. The reviewer will check the PR for mistakes you didn't see the first time. If your code is good, they will *merge* it. If your code is shit, they will *request changes* and provide feedback for you to fix it.
+When a PR is opened, a code review must be done by a teammate or project owner. The reviewer will check the PR for mistakes you didn't see the first time. If your code is good, they will *merge* it. If your code has issue, they will *request changes* and provide feedback for you to fix it.
 
 ### Nit
 
