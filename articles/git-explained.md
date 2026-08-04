@@ -1,8 +1,8 @@
 ---
-title: Git Explained
+title: Git explained
 date: 2026-06-20
 tag: dev
-description: A practical tour of Git on workflow, commands, and how to dig yourself out of the scary situations.
+description: A practical tour of Git on workflow, commands, and how to dig yourself out of scary situations.
 ---
 
 Git is a version control system. It's a history of every change you make to the codebase. You can revert code to previous versions. Teammates work on the code by splitting the timeline into branches and then merging the branches back into one timeline.
@@ -32,7 +32,7 @@ When working on a new feature, you do not work on the main branch. You create a 
 
 After you push, you open a pull request (PR), an official request to merge your changes into main.
 
-When a PR is opened, a code review must be done by a teammate or project owner. The reviewer will check the PR for mistakes you didn't see the first time. If your code is good, they will *merge* it. If your code is shit, they will *request changes* and provide feedback for you to fix it.
+When a PR is opened, a code review must be done by a teammate or project owner. The reviewer will check the PR for mistakes you didn't see the first time. If your code is good, they will *merge* it. If your code has issues, they will *request changes* and provide feedback for you to fix it.
 
 ### Nit
 
@@ -57,8 +57,8 @@ A commit message is a short description of the change you made to the code. Ever
 
 Commit messages are written in the imperative mood; they use the same form as commands like `git pull` and `git merge`. The message says what the change *does* to the codebase, not what it *did*.
 
-(1) `Added login button` is wrong.
-(2) `Add login button` is correct.
+1. `Added login button` is wrong.
+2. `Add login button` is correct.
 
 ## Basic commands
 
@@ -144,7 +144,7 @@ Git history is permanent. Deleted files remain in all prior commits. If sensitiv
 *Warning: this rewrites history. It cannot be undone.*
 
 1. Rotate exposed secrets immediately.
-2. Add the file to `.gitignore`: `echo "<filename>/" >> .gitignore`
+2. Add the file to `.gitignore`: `echo "<filename>" >> .gitignore`
 3. Stop tracking the file: `git rm -r --cached <filename>`
 4. Commit: `git commit -m "stop tracking <filename>"`
 5. Clean the file out of history with [git-filter-repo](https://github.com/newren/git-filter-repo): `git filter-repo --invert-paths --path <filename>`

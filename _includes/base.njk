@@ -147,6 +147,11 @@
     --text-lg: 1.5625rem; /* 25px   · h3, list-title */
     --text-xl: 1.9531rem; /* ~31px  · h2 */
     --text-2xl: clamp(2.5rem, 6vw, 3.7rem); /* 40→59px · page & article titles */
+    /* Article reading-column width. The ToC hangs off the column's right edge
+       (absolute, left:100%), so everything that must line up with the column
+       reads this one value. The 1280px ToC media query is derived from it:
+       760 + 2*(13rem ToC + 2rem gap) = 1240 minimum, plus breathing room. */
+    --reading-width: 760px;
   }
 
   *, *::before, *::after {
@@ -204,16 +209,6 @@
     margin: 0 auto;
     padding: 6rem 1.5rem;
     position: relative;
-  }
-
-  /* Bare footer — empty for now, just reserves space at the bottom of every
-     blog page (aligned to the same column as .page). Content added later. */
-  .site-footer {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem;
-    border-top: 1px solid var(--c-border);
-    min-height: 10rem;
   }
 
   /* ----- Blog index header ----- */
@@ -337,7 +332,7 @@
 
   /* ----- Article nav ----- */
   .article-nav {
-    max-width: 760px;
+    max-width: var(--reading-width); /* back link aligns with the reading column */
     margin-inline: auto;
   }
 
@@ -399,16 +394,26 @@
     border: 0;
     padding: 0;
     background: none;
-    color: var(--c-text-2); /* muted at rest, matching the heading anchors */
-    opacity: 0.4; /* softened at rest; full opacity on hover, like the anchors */
     font: inherit;
-    border-radius: 4px;
     cursor: pointer;
+  }
+
+  /* Muted-icon affordance shared by the code copy button and the heading
+     copy-links: faint at rest, full colour + opacity on hover/focus. Opacity
+     sits on the control (not the SVGs) so it doesn't fight the heading
+     anchor's link↔check crossfade. Scoping the anchor under its heading keeps
+     it outranking the generic .article-body a link rules. */
+  .copy-button,
+  .article-body :is(h2, h3, h4) .heading-anchor {
+    color: var(--c-text-2);
+    opacity: 0.4;
     transition: color 0.2s ease, opacity 0.2s ease;
   }
 
   .copy-button:hover,
-  .copy-button:focus-visible {
+  .copy-button:focus-visible,
+  .article-body :is(h2, h3, h4) .heading-anchor:hover,
+  .article-body :is(h2, h3, h4) .heading-anchor:focus-visible {
     color: var(--c-text-1);
     opacity: 1;
   }
@@ -435,17 +440,16 @@
 
   /* ----- Article ----- */
   /* Shell holds the reading column and positions the ToC in the right margin.
-     It IS the 760px centred column, so the ToC (absolute, left:100%) sits in the
-     margin without shifting the reading column off-centre. */
+     It IS the centred reading column, so the ToC (absolute, left:100%) sits in
+     the margin without shifting the reading column off-centre. The width lives
+     only here (via --reading-width); .article-page just fills the shell. */
   .article-shell {
     position: relative;
-    max-width: 760px;
+    max-width: var(--reading-width);
     margin-inline: auto;
   }
 
   .article-page {
-    max-width: 760px;
-    margin-inline: auto;
     padding-top: 2.5rem;
   }
 
@@ -728,11 +732,9 @@
        no line-box change, so still no layout shift. */
     vertical-align: middle;
     transform: translateY(-0.1em);
-    color: var(--c-text-2); /* muted at rest — readable, darkens on hover */
-    opacity: 0.4; /* softened at rest; full opacity on hover. On the anchor (not
-                     the SVGs) so it doesn't fight the link↔check crossfade. */
+    /* Rest/hover colour + opacity come from the shared muted-icon rule in the
+       code-block section above. */
     text-decoration: none;
-    transition: color 0.2s ease, opacity 0.2s ease;
   }
 
   /* Expanded hit target: comfortable to click/tap without enlarging the glyph
@@ -741,14 +743,6 @@
     content: "";
     position: absolute;
     inset: -0.5rem;
-  }
-
-  /* Brighten on hover/focus. Scoped under the heading so it outranks the generic
-     `.article-body a` link rules above. */
-  .article-body :is(h2, h3, h4) .heading-anchor:hover,
-  .article-body :is(h2, h3, h4) .heading-anchor:focus-visible {
-    color: var(--c-text-1);
-    opacity: 1;
   }
 
   .heading-anchor svg {
@@ -828,8 +822,6 @@
 </svg>
 
 {{ content | safe }}
-
-<footer class="site-footer"></footer>
 
 {% raw %}<script>
   // Slide-bar hover on every back link, matching the main site nav/card links:

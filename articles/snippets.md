@@ -5,7 +5,7 @@ tag: work
 description: A few snippets from recent work.
 ---
 
-<video class="article-video" src="/img/vibecheck-demo.webm" controls playsinline preload="metadata"></video>
+<video src="/img/vibecheck-demo.webm" controls playsinline preload="metadata"></video>
 
 ![Inbox sentiment chart](/img/inbox-sentiment-chart.avif)
 

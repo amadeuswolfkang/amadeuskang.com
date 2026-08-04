@@ -28,6 +28,21 @@ ogType: article
     const body = document.querySelector('.article-body');
     if (!body) return;
 
+    // How long copy confirmations stay visible before reverting.
+    const CONFIRM_MS = 1200;
+
+    // Shared clipboard write for both copy affordances. navigator.clipboard is
+    // undefined outside a secure context, and writeText() rejects if the
+    // document isn't focused or permission is denied; each outcome routes to a
+    // caller-supplied handler so a click never throws or stalls silently.
+    function writeClipboard(text, on) {
+      if (!navigator.clipboard) {
+        on.unavailable();
+        return;
+      }
+      navigator.clipboard.writeText(text).then(on.copied, on.failed);
+    }
+
     // Wrap each rendered <pre> in code-block chrome: a language label and a
     // working copy button.
     function enhanceCodeBlocks() {
@@ -56,20 +71,14 @@ ogType: article
           setTimeout(() => {
             button.setAttribute('aria-label', 'Copy code');
             button.title = 'Copy code';
-          }, 1200);
+          }, CONFIRM_MS);
         };
         button.addEventListener('click', () => {
-          // navigator.clipboard is undefined outside a secure context and
-          // writeText() rejects if the document isn't focused or permission is
-          // denied. Handle both so the click never throws or stalls silently.
-          if (!navigator.clipboard) {
-            flash('Copy unavailable');
-            return;
-          }
-          navigator.clipboard.writeText((code || pre).textContent).then(
-            () => flash('Copied'),
-            () => flash('Copy failed')
-          );
+          writeClipboard((code || pre).textContent, {
+            copied: () => flash('Copied'),
+            unavailable: () => flash('Copy unavailable'),
+            failed: () => flash('Copy failed'),
+          });
         });
       });
     }
@@ -118,16 +127,14 @@ ogType: article
           const confirm = () => {
             anchor.classList.add('is-copied');
             if (revert) clearTimeout(revert);
-            revert = setTimeout(() => anchor.classList.remove('is-copied'), 1200);
+            revert = setTimeout(() => anchor.classList.remove('is-copied'), CONFIRM_MS);
           };
-          // No clipboard (insecure context) → at least put it in the address bar.
-          if (!navigator.clipboard) {
+          // Whether clipboard is missing or the write failed, at least put the
+          // URL in the address bar.
+          const fallback = () => {
             location.hash = heading.id;
-            return;
-          }
-          navigator.clipboard.writeText(url).then(confirm, () => {
-            location.hash = heading.id;
-          });
+          };
+          writeClipboard(url, { copied: confirm, unavailable: fallback, failed: fallback });
         });
       });
     }
@@ -135,7 +142,7 @@ ogType: article
     // Table of contents (shown in the right margin on wide screens; hidden via
     // CSS on narrow ones). Built from the same h2/h3/h4[id] set, with scroll-spy
     // highlighting whichever section is currently near the top of the viewport.
-    function buildTableOfContents(headings) {
+    function buildTableOfContents(headings, labels) {
       const toc = document.querySelector('.article-toc');
       if (!toc || headings.length < 2) return;
 
@@ -170,8 +177,9 @@ ogType: article
         const a = document.createElement('a');
         a.className = 'toc-link';
         a.href = '#' + heading.id;
-        // textContent excludes the appended anchor icon (SVGs carry no text).
-        a.textContent = heading.textContent.trim();
+        // Labels were captured before the anchor pass, so they can't inherit
+        // any text a future anchor icon or hidden a11y span might carry.
+        a.textContent = labels.get(heading);
         li.appendChild(a);
         top.ul.appendChild(li);
         linkById.set(heading.id, a);
@@ -249,12 +257,34 @@ ogType: article
       );
     }
 
-    // Run the passes. Anchors are added before the ToC reads heading text; the
-    // appended icon is text-free, so entry labels stay clean regardless.
+    // Run the passes.
     const headings = body.querySelectorAll('h2[id], h3[id], h4[id]');
+
+    // Capture ToC labels before addHeadingAnchors mutates the headings, so the
+    // labels can never pick up text from the injected anchors. (This matters
+    // for the deferred wide-viewport ToC build below, which always runs after
+    // the anchor pass.)
+    const tocLabels = new Map();
+    headings.forEach((heading) => tocLabels.set(heading, heading.textContent.trim()));
+
     enhanceCodeBlocks();
     linkifyImages();
     addHeadingAnchors(headings);
-    buildTableOfContents(headings);
+
+    // The ToC is display:none at 1280px and below (see base.njk), so narrow
+    // viewports shouldn't pay to build it, observe every heading, and listen
+    // to scroll for a component they can never show. Build it lazily the
+    // first time the viewport is wide enough; "change" fires only on media
+    // query crossings, so the listener stays inert on phones.
+    const tocViewport = window.matchMedia('(min-width: 1281px)');
+    if (tocViewport.matches) {
+      buildTableOfContents(headings, tocLabels);
+    } else {
+      tocViewport.addEventListener('change', function onWide(e) {
+        if (!e.matches) return;
+        tocViewport.removeEventListener('change', onWide);
+        buildTableOfContents(headings, tocLabels);
+      });
+    }
   })();
 </script>{% endraw %}

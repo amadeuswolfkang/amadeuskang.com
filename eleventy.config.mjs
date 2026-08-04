@@ -34,19 +34,22 @@ export default function (eleventyConfig) {
         .replace(/^-|-$/g, ""); // trim edges
 
     md.core.ruler.push("heading_ids", (state) => {
-      const seen = new Map();
+      const used = new Set();
       const tokens = state.tokens;
       for (let i = 0; i < tokens.length; i++) {
         const open = tokens[i];
         if (open.type !== "heading_open") continue;
         if (!["h2", "h3", "h4"].includes(open.tag)) continue;
         const inline = tokens[i + 1];
-        let slug = slugify(inline && inline.type === "inline" ? inline.content : "");
+        const slug = slugify(inline && inline.type === "inline" ? inline.content : "");
         if (!slug) continue;
-        const n = seen.get(slug) || 0;
-        seen.set(slug, n + 1);
-        if (n > 0) slug = `${slug}-${n + 1}`; // de-dupe repeats: foo, foo-2, foo-3
-        open.attrSet("id", slug);
+        // De-dupe repeats (foo, foo-2, foo-3) against every id actually
+        // emitted, not just base slugs, so a suffix can't collide with a
+        // heading whose text already slugifies to it ("Foo", "Foo", "Foo 2").
+        let id = slug;
+        for (let n = 2; used.has(id); n++) id = `${slug}-${n}`;
+        used.add(id);
+        open.attrSet("id", id);
       }
     });
   });
