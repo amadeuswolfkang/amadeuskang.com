@@ -11,6 +11,10 @@ export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("fonts");
   eleventyConfig.addPassthroughCopy("gsap-public");
   eleventyConfig.addPassthroughCopy("vendor/lenis");
+  eleventyConfig.addPassthroughCopy("favicon");
+  // Also serve the .ico at the site root; browsers and crawlers request
+  // /favicon.ico blindly when no page (and its <link> tags) is in hand.
+  eleventyConfig.addPassthroughCopy({ "favicon/favicon.ico": "favicon.ico" });
 
   // YYYY-MM-DD for the blog list and article kicker.
   eleventyConfig.addFilter("isoDate", (value) => {
