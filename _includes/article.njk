@@ -242,11 +242,53 @@ ogType: article
         return (aboveBand || headings[0]).id;
       };
 
+      // End zone: headings in the last stretch of the page may never reach the
+      // band at all; the page runs out of scroll while their tops are still
+      // mid-viewport, so the observer can never elect them. (A short last
+      // section is the obvious case, but several short trailing sections can
+      // all be affected.) Once scrolled past the point where the last
+      // band-reachable heading enters the band, split the remaining scroll
+      // evenly among the unreachable headings so each takes its turn in order,
+      // ending on the last at the very bottom. Returns null outside the zone.
+      // Positions are measured per call (not cached) so late image loads or
+      // resizes can't leave the zone boundaries stale.
+      const endZoneActive = () => {
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const bandBottom = window.innerHeight * ACTIVE_BAND;
+        const docTop = (h) => h.getBoundingClientRect().top + window.scrollY;
+        // Find the contiguous tail of headings whose tops sit below the band
+        // even at full scroll (heading tops increase down the page, so walking
+        // backwards can stop at the first reachable one).
+        let first = headings.length;
+        for (let i = headings.length - 1; i >= 0; i--) {
+          if (docTop(headings[i]) - maxScroll > bandBottom) first = i;
+          else break;
+        }
+        if (first === headings.length) return null;
+        // The zone starts where the nearest reachable heading enters the band
+        // (or at the page top if nothing is reachable). 2px of slack absorbs
+        // sub-pixel rounding at the boundary.
+        const zoneStart = first === 0 ? 0 : docTop(headings[first - 1]) - bandBottom;
+        if (window.scrollY < zoneStart - 2) return null;
+        // Segment 0 keeps the reachable heading active (matching what the band
+        // logic says at that moment); segments 1..count are the unreachable
+        // tail. progress caps at 1 so overscroll clamps to the last heading.
+        const count = headings.length - first;
+        const span = maxScroll - zoneStart;
+        const progress = span > 0 ? Math.min(1, (window.scrollY - zoneStart) / span) : 1;
+        const step = Math.min(count, Math.floor(progress * (count + 1)));
+        return headings[Math.max(0, first - 1 + step)].id;
+      };
+
       // Recompute on every band crossing. The observer fires only when a heading
       // enters or leaves the top band, the exact moments the answer can change;
-      // the highlight rightly persists between those events.
+      // the highlight rightly persists between those events. Inside the end
+      // zone the scroll handler below owns the highlight, so crossings there
+      // (reachable headings drifting above the viewport) must not clobber it.
       const observer = new IntersectionObserver(
-        () => setActive(activeCandidate()),
+        () => {
+          if (!endZoneActive()) setActive(activeCandidate());
+        },
         { rootMargin: `0px 0px -${(1 - ACTIVE_BAND) * 100}% 0px`, threshold: 0 }
       );
       headings.forEach((heading) => observer.observe(heading));
@@ -254,27 +296,24 @@ ogType: article
       // Seed the at-rest highlight: the observer only fires on changes, so on
       // load (or after a deep-link jump) nothing is highlighted until something
       // crosses the band.
-      setActive(activeCandidate());
+      setActive(endZoneActive() || activeCandidate());
 
-      // A short last section can't scroll far enough to push its heading into
-      // the top band, so the observer never activates it. When the page bottoms
-      // out, force the last entry active. The force must be undone by an
-      // explicit recompute on the first scroll back up: the observer only fires
-      // on band crossings, and the heading that was inside the band when the
-      // force happened exits downward without ever re-crossing, so waiting for
-      // the observer would skip that section on the way up.
-      const lastId = headings[headings.length - 1].id;
-      let forcedBottom = false;
+      // The observer can't drive the end zone (no band crossings happen for
+      // unreachable headings), so the scroll handler does. Leaving the zone
+      // upward needs an explicit recompute for the same reason: the heading
+      // that was inside the band when the zone took over exits downward
+      // without ever re-crossing, so waiting for the observer would skip its
+      // section on the way up.
+      let inEndZone = false;
       window.addEventListener(
         'scroll',
         () => {
-          const scrolled = window.innerHeight + window.scrollY;
-          // 2px of slack absorbs sub-pixel rounding so "at the bottom" still trips.
-          if (scrolled >= document.documentElement.scrollHeight - 2) {
-            forcedBottom = true;
-            setActive(lastId);
-          } else if (forcedBottom) {
-            forcedBottom = false;
+          const id = endZoneActive();
+          if (id) {
+            inEndZone = true;
+            setActive(id);
+          } else if (inEndZone) {
+            inEndZone = false;
             setActive(activeCandidate());
           }
         },
