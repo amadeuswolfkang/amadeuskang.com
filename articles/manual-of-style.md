@@ -9,7 +9,7 @@ description: Comprehensive and opinionated manual of writing and style conventio
 
 This is an opinionated style optimizing for legibility and density, written for both humans and LLMs. It's influenced by *The Elements of Style* (Strunk & White) and personal experience.
 
-# Guidelines
+## Guidelines
 - **No hedging:** avoid hedging to make clear, direct, and strong claims.
 - **Classic prose style:** write serious arguments in Francis-Noël Thomas & Mark Turner's classic prose style from _Clear and Simple As The Truth_, observational and analytical.
 - **Rule of n:** instead of defaulting to the rule of 3, consider the rule of n where n is the sufficient number of terms to express the writer's intent. For example, if 4 items better triangulate the general idea behind 3 items, then use 4.
