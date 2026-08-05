@@ -243,15 +243,25 @@ ogType: article
 
       // A short last section can't scroll far enough to push its heading into
       // the top band, so the observer never activates it. When the page bottoms
-      // out, force the last entry active; scrolling back up lets the observer
-      // take over again.
+      // out, force the last entry active. The force must be undone by an
+      // explicit recompute on the first scroll back up: the observer only fires
+      // on band crossings, and the heading that was inside the band when the
+      // force happened exits downward without ever re-crossing, so waiting for
+      // the observer would skip that section on the way up.
       const lastId = headings[headings.length - 1].id;
+      let forcedBottom = false;
       window.addEventListener(
         'scroll',
         () => {
           const scrolled = window.innerHeight + window.scrollY;
           // 2px of slack absorbs sub-pixel rounding so "at the bottom" still trips.
-          if (scrolled >= document.documentElement.scrollHeight - 2) setActive(lastId);
+          if (scrolled >= document.documentElement.scrollHeight - 2) {
+            forcedBottom = true;
+            setActive(lastId);
+          } else if (forcedBottom) {
+            forcedBottom = false;
+            setActive(activeCandidate());
+          }
         },
         { passive: true }
       );
