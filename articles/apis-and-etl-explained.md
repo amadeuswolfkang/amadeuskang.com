@@ -5,8 +5,6 @@ tag: dev
 description: Brief introduction to APIs and ETL for data engineering on-ramping.
 ---
 
-## What is an API?
-
 An API (application programming interface) is an interface that enables a client app to request data from a server. A simple example is your social media feed on Instagram. Every time you scroll down, the app calls an API to fetch posts to display on your screen.
 
 ## How do APIs work?

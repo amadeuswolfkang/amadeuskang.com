@@ -5,8 +5,6 @@ tag: writing
 description: Comprehensive and opinionated manual of writing and style conventions.
 ---
 
-# Manual of Style
-
 This is an opinionated style optimizing for legibility and density, written for both humans and LLMs. It's influenced by *The Elements of Style* (Strunk & White) and personal experience.
 
 ## Guidelines
