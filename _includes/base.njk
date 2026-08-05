@@ -537,6 +537,18 @@
     }
   }
 
+  /* Empty footer: bottom breathing room that also helps trailing headings
+     scroll up into the scroll-spy's active band, so the band logic covers
+     most of the tail directly. Sized for taste, not correctness: the JS end
+     zone (article.njk) handles any heading still unreachable, so this can
+     shrink or grow freely. ToC viewports only: below 1281px there is no
+     scroll-spy to serve, so narrow screens keep the natural page end. */
+  @media (min-width: 1281px) {
+    .article-page {
+      padding-bottom: 25vh;
+    }
+  }
+
   .article-header {
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--c-border);
