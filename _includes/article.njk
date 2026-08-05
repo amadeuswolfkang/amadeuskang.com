@@ -148,9 +148,24 @@ ogType: article
 
       const inner = document.createElement('div');
       inner.className = 'toc-inner';
+      // The title doubles as the route back to the top; the article title and
+      // intro have no ToC entry, so this label is the only way back up. A real
+      // link (not a click handler on the <p>) keeps it keyboard-focusable and
+      // announced. The jump is instant to match the section links, and the
+      // section hash is stripped so the URL doesn't claim a section you left.
       const title = document.createElement('p');
       title.className = 'toc-title';
-      title.textContent = 'On this page';
+      const topLink = document.createElement('a');
+      topLink.href = '#';
+      topLink.textContent = 'On this page';
+      topLink.title = 'Back to top';
+      topLink.setAttribute('aria-label', 'Back to top');
+      topLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.scrollTo(0, 0);
+        history.replaceState(null, '', location.pathname + location.search);
+      });
+      title.appendChild(topLink);
       const list = document.createElement('ul');
       list.className = 'toc-list';
 
