@@ -37,6 +37,10 @@
 {% if ogType == 'article' %}<link rel="preload" href="/fonts/Gentium/Gentium-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/Gentium/Gentium-Bold.woff2" as="font" type="font/woff2" crossorigin>
 {% else %}<link rel="preload" href="/fonts/Exo_2/Exo2-VariableFont_wght.woff2" as="font" type="font/woff2" crossorigin>{% endif %}
+
+<!-- Self-hosted KaTeX stylesheet (math is pre-rendered to HTML at build time;
+     this is styling only, no math JS). Articles only — the index has no math. -->
+{% if ogType == 'article' %}<link rel="stylesheet" href="/vendor/katex/katex.min.css">{% endif %}
 <script>document.documentElement.classList.add('js');</script>
 
 {% raw %}<style>
@@ -670,6 +674,13 @@
     margin-top: 0.4rem;
   }
 
+  /* Rhythm inside a multi-block list item (a step whose content spans prose,
+     display math, or a table). The global reset zeroes p margins, so loose-list
+     paragraphs would otherwise sit flush against each other. */
+  .article-body li > * + * {
+    margin-top: 0.6rem;
+  }
+
   .article-body strong {
     font-weight: 600;
     color: var(--c-text-1);
@@ -715,6 +726,69 @@
 
   .article-body .code-block {
     margin-top: 1.5rem;
+  }
+
+  /* ----- Tables ----- */
+  /* Every table is wrapped in .table-scroll at build time (eleventy.config.mjs),
+     so a table wider than the reading column scrolls inside its own box rather
+     than escaping it. Horizontal rules only (no vertical grid); headers stay on
+     one line; digits use tabular figures so columns of numbers align. Numeric
+     column alignment comes from markdown alignment colons (---:), which emit
+     inline text-align styles. */
+  .article-body .table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    /* Tables want more air than the generic sibling rhythm (1.25rem, or 0.6rem
+       inside a list item) provides; this outranks both rules on specificity.
+       The bottom margin collapses with the next sibling's margin-top. */
+    margin-block: 2.5rem;
+  }
+
+  .article-body table {
+    margin-inline: auto; /* centered in the column; inert once it overflows */
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+    /* Booktabs-style top rule. Without it the table's top boundary is bare
+       header text while the bottom ends in an inked rule, which makes equal
+       margins read as unequal (top airier than bottom). */
+    border-top: 1px solid var(--c-text-1);
+  }
+
+  .article-body th,
+  .article-body td {
+    padding: 0.45rem 1.25rem 0.45rem 0;
+    text-align: left;
+  }
+
+  .article-body :is(th, td):last-child {
+    padding-right: 0;
+  }
+
+  .article-body th {
+    white-space: nowrap;
+    font-size: 0.75em;
+    font-weight: 700;
+    border-bottom: 1px solid var(--c-text-1);
+  }
+
+  .article-body td {
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  /* Close the frame at full strength: outer rules (table top, last row bottom)
+     match, inner row separators stay light. */
+  .article-body tr:last-child td {
+    border-bottom-color: var(--c-text-1);
+  }
+
+  /* ----- Display math ----- */
+  /* KaTeX display blocks never line-wrap; when one is wider than the column it
+     scrolls in place instead of escaping. The block padding keeps glyphs clear
+     of the scrollbar when it appears. */
+  .article-body .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-block: 0.25rem;
   }
 
   /* Markdown wraps a standalone image in its own <p>, so vertical rhythm comes

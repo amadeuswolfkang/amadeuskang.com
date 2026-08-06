@@ -1,4 +1,5 @@
 import { feedPlugin } from "@11ty/eleventy-plugin-rss";
+import { katex } from "@mdit/plugin-katex";
 
 export default function (eleventyConfig) {
   // Only template-process Nunjucks and Markdown. The hand-built static pages
@@ -15,6 +16,12 @@ export default function (eleventyConfig) {
   // Also serve the .ico at the site root; browsers and crawlers request
   // /favicon.ico blindly when no page (and its <link> tags) is in hand.
   eleventyConfig.addPassthroughCopy({ "favicon/favicon.ico": "favicon.ico" });
+  // Self-hosted KaTeX assets (no CDN). The stylesheet references its fonts via
+  // relative url(fonts/...), so the two must ship side by side.
+  eleventyConfig.addPassthroughCopy({
+    "node_modules/katex/dist/katex.min.css": "vendor/katex/katex.min.css",
+    "node_modules/katex/dist/fonts": "vendor/katex/fonts",
+  });
 
   // YYYY-MM-DD for the blog list and article kicker.
   eleventyConfig.addFilter("isoDate", (value) => {
@@ -28,6 +35,16 @@ export default function (eleventyConfig) {
   // rolled rather than pulling in markdown-it-anchor — we only need the id, and
   // the slug + collision handling is a few lines.
   eleventyConfig.amendLibrary("md", (md) => {
+    // Build-time KaTeX: $...$ / $$...$$ in article markdown render to static
+    // HTML text (selectable, copy-pastable); no client-side math JS.
+    md.use(katex);
+
+    // Wrap every table in a scroll container at build time, so a table wider
+    // than the reading column scrolls inside its own box instead of escaping
+    // it (styled in base.njk; works without JS).
+    md.renderer.rules.table_open = () => '<div class="table-scroll">\n<table>\n';
+    md.renderer.rules.table_close = () => '</table>\n</div>\n';
+
     const slugify = (text) =>
       text
         .toLowerCase()
