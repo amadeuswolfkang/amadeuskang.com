@@ -1,5 +1,7 @@
 CLAUDE.md
 TODO.md
+# Local dependency/vulnerability ledger; regenerated from npm audit, not source.
+BREAKAGE.md
 amadeuskang.com.code-workspace
 .DS_Store
 node_modules/
