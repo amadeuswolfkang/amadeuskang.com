@@ -232,6 +232,15 @@ ogType: article
         // Labels were captured before the anchor pass, so they can't inherit
         // any text a future anchor icon or hidden a11y span might carry.
         a.textContent = labels.get(heading);
+        // Trapped entries need the scroll position corrected; every other link
+        // is left to the browser. See segmentMidpoint below.
+        a.addEventListener('click', (e) => {
+          const y = segmentMidpoint(heading.id);
+          if (y === null) return;
+          e.preventDefault();
+          window.scrollTo(0, y);
+          history.pushState(null, '', '#' + heading.id);
+        });
         li.appendChild(a);
         top.ul.appendChild(li);
         linkById.set(heading.id, a);
@@ -243,119 +252,196 @@ ogType: article
       toc.appendChild(inner);
       toc.hidden = false;
 
+      // aria-current mirrors the visual highlight, so the ToC announces which
+      // section you are in rather than looking active and reading inert. The
+      // value matches what the native :target-current feature is specified to
+      // expose, so the two stay consistent if this is ever swapped for it.
       let activeId = null;
       const setActive = (id) => {
         if (id === activeId) return;
         const prev = activeId && linkById.get(activeId);
-        if (prev) prev.classList.remove('is-active');
+        if (prev) {
+          prev.classList.remove('is-active');
+          prev.removeAttribute('aria-current');
+        }
         activeId = id;
-        const link = linkById.get(id);
-        if (link) link.classList.add('is-active');
+        const link = id && linkById.get(id);
+        if (link) {
+          link.classList.add('is-active');
+          link.setAttribute('aria-current', 'true');
+        }
       };
 
       // Fraction of the viewport height, measured from the top, that counts as
-      // the "active" zone. Drives both the observer's rootMargin and the
-      // position scan below; keep them driven by this one value.
+      // the "active" zone: a heading activates once its top edge enters it.
       const ACTIVE_BAND = 0.25;
+      // Sub-pixel slack, so rounding can't strand a heading a fraction of a
+      // pixel short of activating. Pure slop; nothing depends on its value.
+      const SLACK = 2;
 
-      // The section you're "on": the TOPMOST heading whose top edge sits inside
-      // the band. Topmost, not lowest. After a click or deep-link jump the
-      // target heading and the next one can both land in the band, and the
-      // target is the upper of the two. Headings are in document order, so their
-      // tops increase down the page: skip the ones scrolled above the top,
-      // return the first one inside the band, and stop once we pass below it.
-      // When nothing is in the band (deep inside a long section) fall back to the
-      // last heading scrolled above the top, then to the first heading, so a
-      // reload mid-article still highlights the current section, not section one.
-      const activeCandidate = () => {
+      // NodeList has forEach but not map/findIndex, and the threshold pass
+      // wants both.
+      const items = Array.from(headings);
+
+      // The scroll-spy primitive: each heading's ACTIVATION THRESHOLD, the
+      // scrollY it takes over at. Heading i owns the scroll interval
+      // (t[i], t[i + 1]], so the rule is one line (active is the last threshold
+      // scrolled past) and the property we care about, that every heading owns
+      // a nonempty stretch of scroll and the stretches run in document order,
+      // holds by construction of a strictly increasing list.
+      //
+      // A heading takes over at the LATER of two crossings:
+      //
+      //   its own top entering the band, and
+      //   the heading before it clearing the top of the viewport.
+      //
+      // The second term is what makes the topmost heading in the band win
+      // rather than the lowest: after a ToC click or a deep link the target and
+      // the following heading often sit in the band together, and lowest-wins
+      // would bold the section after the one you landed on.
+      //
+      // Both crossings are exclusive, which is why the scan below compares with
+      // > and not >=. An anchor jump lands scrollY exactly on the target's
+      // document top, which is exactly the next heading's second term, so >=
+      // would let the next heading tie and win: the very case the term exists
+      // to fix, and one that never arises while scrolling by hand. That is also
+      // why a threshold landing exactly ON maxScroll counts as unreachable
+      // below; there is no scroll position strictly past it.
+      //
+      // Trailing headings whose thresholds land at or past the end of the
+      // scrollable range can never be reached: the page runs out of scroll
+      // while their tops are still mid-viewport. Thresholds increase in
+      // document order, so those form a suffix, and we respace it evenly across the
+      // scroll that remains. Each still takes its turn in order and the last
+      // lands at the very bottom. That is the whole of the old "end zone", now
+      // a preprocessing step on this rule's input instead of a second regime
+      // running beside it.
+      //
+      // Positions are measured per call, never cached, so late image loads,
+      // lazy diagrams, and resizes can't leave thresholds stale. All reads
+      // happen together, before any class writes, so a frame costs one layout.
+      const thresholds = (maxScroll) => {
         const bandBottom = window.innerHeight * ACTIVE_BAND;
-        let aboveBand = null;
-        for (const heading of headings) {
-          const top = heading.getBoundingClientRect().top;
-          if (top > bandBottom) break;
-          if (top >= 0) return heading.id;
-          aboveBand = heading;
+        // Headings that aren't rendered (a collapsed <details>, an inactive tab
+        // panel, anything display:none) report an all-zero rect, which would
+        // compute to a threshold that tracks the scroll position instead of the
+        // document, letting a phantom entry capture the highlight. Drop them
+        // here rather than at build time, so a section that is revealed later
+        // rejoins the spy on the next frame.
+        const live = [];
+        const tops = [];
+        for (const heading of items) {
+          const rect = heading.getBoundingClientRect();
+          if (rect.width === 0 && rect.height === 0) continue;
+          live.push(heading);
+          tops.push(rect.top + window.scrollY);
         }
-        return (aboveBand || headings[0]).id;
+        const t = tops.map((top, i) => {
+          const entersBand = top - bandBottom - SLACK;
+          const predecessorClearsTop = i === 0 ? -Infinity : tops[i - 1];
+          return Math.max(entersBand, predecessorClearsTop);
+        });
+        const first = t.findIndex((x) => x >= maxScroll);
+        if (first !== -1) {
+          // The zone starts at the last reachable threshold (or the page top if
+          // nothing is reachable), and the reachable heading holds the first
+          // segment, since the first synthetic threshold sits one step past it.
+          const zoneStart = first === 0 ? 0 : t[first - 1];
+          const step = (maxScroll - zoneStart) / (t.length - first + 1);
+          for (let i = first; i < t.length; i++) t[i] = zoneStart + step * (i - first + 1);
+        }
+        return { live: live, t: t };
       };
 
-      // End zone: headings in the last stretch of the page may never reach the
-      // band at all; the page runs out of scroll while their tops are still
-      // mid-viewport, so the observer can never elect them. (A short last
-      // section is the obvious case, but several short trailing sections can
-      // all be affected.) Once scrolled past the point where the last
-      // band-reachable heading enters the band, split the remaining scroll
-      // evenly among the unreachable headings so each takes its turn in order,
-      // ending on the last at the very bottom. Returns null outside the zone.
-      // Positions are measured per call (not cached) so late image loads or
-      // resizes can't leave the zone boundaries stale.
-      const endZoneActive = () => {
+      // Anchor navigation scrolls to a heading's document top, clamped to the
+      // scrollable range. Near the end of the page that clamp can drop you
+      // outside the heading's own segment: click a section whose top sits past
+      // maxScroll and you land at the bottom, where the largest threshold
+      // passed belongs to a LATER heading, so the ToC bolds the wrong entry.
+      //
+      // The criterion is the landing position, not whether the heading was
+      // respaced. Those differ: a heading can have a reachable threshold (so
+      // the respacing leaves it alone) and still have an unreachable document
+      // top (so the browser overshoots it). Asking "would the browser land
+      // inside this heading's segment" covers both, and out-of-order layouts
+      // besides. Returns null when the browser gets it right.
+      //
+      // Thresholds are recomputed here rather than remembered from render
+      // time, so a layout change in between (late image, lazy diagram) can't
+      // stale them. That the model is a pure function of current layout is
+      // what makes correcting its own edge case this cheap.
+      const segmentMidpoint = (id) => {
         const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        const bandBottom = window.innerHeight * ACTIVE_BAND;
-        const docTop = (h) => h.getBoundingClientRect().top + window.scrollY;
-        // Find the contiguous tail of headings whose tops sit below the band
-        // even at full scroll (heading tops increase down the page, so walking
-        // backwards can stop at the first reachable one).
-        let first = headings.length;
-        for (let i = headings.length - 1; i >= 0; i--) {
-          if (docTop(headings[i]) - maxScroll > bandBottom) first = i;
-          else break;
-        }
-        if (first === headings.length) return null;
-        // The zone starts where the nearest reachable heading enters the band
-        // (or at the page top if nothing is reachable). 2px of slack absorbs
-        // sub-pixel rounding at the boundary.
-        const zoneStart = first === 0 ? 0 : docTop(headings[first - 1]) - bandBottom;
-        if (window.scrollY < zoneStart - 2) return null;
-        // Segment 0 keeps the reachable heading active (matching what the band
-        // logic says at that moment); segments 1..count are the unreachable
-        // tail. progress caps at 1 so overscroll clamps to the last heading.
-        const count = headings.length - first;
-        const span = maxScroll - zoneStart;
-        const progress = span > 0 ? Math.min(1, (window.scrollY - zoneStart) / span) : 1;
-        const step = Math.min(count, Math.floor(progress * (count + 1)));
-        return headings[Math.max(0, first - 1 + step)].id;
+        if (maxScroll <= 0) return null;
+        const measured = thresholds(maxScroll);
+        const i = measured.live.findIndex((heading) => heading.id === id);
+        if (i === -1) return null;
+        const t = measured.t;
+        const next = i + 1 < t.length ? t[i + 1] : maxScroll;
+        const top = measured.live[i].getBoundingClientRect().top + window.scrollY;
+        const landing = Math.min(top, maxScroll);
+        if (landing > t[i] && landing <= next) return null;
+        return (t[i] + next) / 2;
       };
 
-      // Recompute on every band crossing. The observer fires only when a heading
-      // enters or leaves the top band, the exact moments the answer can change;
-      // the highlight rightly persists between those events. Inside the end
-      // zone the scroll handler below owns the highlight, so crossings there
-      // (reachable headings drifting above the viewport) must not clobber it.
-      const observer = new IntersectionObserver(
-        () => {
-          if (!endZoneActive()) setActive(activeCandidate());
-        },
-        { rootMargin: `0px 0px -${(1 - ACTIVE_BAND) * 100}% 0px`, threshold: 0 }
-      );
-      headings.forEach((heading) => observer.observe(heading));
-
-      // Seed the at-rest highlight: the observer only fires on changes, so on
-      // load (or after a deep-link jump) nothing is highlighted until something
-      // crosses the band.
-      setActive(endZoneActive() || activeCandidate());
-
-      // The observer can't drive the end zone (no band crossings happen for
-      // unreachable headings), so the scroll handler does. Leaving the zone
-      // upward needs an explicit recompute for the same reason: the heading
-      // that was inside the band when the zone took over exits downward
-      // without ever re-crossing, so waiting for the observer would skip its
-      // section on the way up.
-      let inEndZone = false;
-      window.addEventListener(
-        'scroll',
-        () => {
-          const id = endZoneActive();
-          if (id) {
-            inEndZone = true;
-            setActive(id);
-          } else if (inEndZone) {
-            inEndZone = false;
-            setActive(activeCandidate());
+      const electActive = () => {
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const measured = thresholds(maxScroll);
+        const live = measured.live;
+        const t = measured.t;
+        if (!live.length) return null;
+        if (maxScroll <= 0) return live[0].id;
+        // The LARGEST threshold scrolled past, not the last one in document
+        // order. Those coincide while thresholds increase down the page, which
+        // is the normal case, but float, grid order and absolute positioning
+        // can put a heading's box above its predecessor's. Taking the maximum
+        // needs no such assumption; ties go to the earliest heading, since a
+        // later one has to beat the running best outright.
+        // None passed means we sit above the first heading's activation point,
+        // so the first entry holds; that also keeps a mid-article reload on the
+        // current section rather than section one, since every threshold above
+        // the viewport counts as passed. Overscroll clamps for free: past
+        // maxScroll every threshold is passed.
+        let active = 0;
+        let best = -Infinity;
+        for (let i = 0; i < t.length; i++) {
+          if (window.scrollY > t[i] && t[i] > best) {
+            best = t[i];
+            active = i;
           }
-        },
-        { passive: true }
-      );
+        }
+        return live[active].id;
+      };
+
+      // One driver, no handoff. A rAF-throttled scroll listener rather than an
+      // IntersectionObserver: an observer earns its keep when it removes the
+      // always-on scroll listener entirely, and this rule needs positions on
+      // every scroll regardless, so an observer would only add a second driver
+      // to coordinate with. Throttling to a frame also collapses the layout
+      // reads a per-event handler would force.
+      let raf = 0;
+      const update = () => {
+        raf = 0;
+        setActive(electActive());
+      };
+      const schedule = () => {
+        if (!raf) raf = requestAnimationFrame(update);
+      };
+      window.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule, { passive: true });
+      // Layout can shift without any scroll (late images, the lazy Mermaid
+      // pass), which moves every threshold.
+      new ResizeObserver(schedule).observe(document.body);
+      // A deep link to a trapped heading lands wrong for the same reason a
+      // click on one does, so correct it before seeding rather than after, and
+      // let the seed read the corrected position.
+      if (location.hash) {
+        const y = segmentMidpoint(decodeURIComponent(location.hash.slice(1)));
+        if (y !== null) window.scrollTo(0, y);
+      }
+      // Seed the at-rest highlight synchronously, so the ToC is never blank for
+      // a frame on load or after a deep-link jump.
+      update();
     }
 
     // Run the passes.

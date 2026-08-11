@@ -152,6 +152,4 @@ Git history is permanent. Deleted files remain in all prior commits. If sensitiv
 
 ## Can AI run Git commands?
 
-Yes, but I don't allow AI to run destructive Git commands.
-
-I ask Claude to review commands, but ultimately, I'm the one who enters them. This guards against blindly approving a series of Git operations. I once asked Claude if `git clean -fd` could delete all untracked files except one. Claude saved an untracked copy of that file and deleted all untracked files, including the copy.
+Yes, but I don't allow AI to run destructive Git commands; I hand-type them myself to guards against blindly approving a series of Git operations when tired or time-pressured.
