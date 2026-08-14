@@ -791,49 +791,6 @@
     padding-block: 0.25rem;
   }
 
-  /* Mermaid diagrams: <pre class="mermaid"> from ```mermaid fences (fence
-     override in eleventy.config.mjs), rendered to inline SVG client-side in
-     article.njk. Excluded from the code-block chrome, so it sets its own
-     rhythm (matching tables); a diagram wider than the column scrolls in
-     place like tables and display math. */
-  .article-body pre.mermaid {
-    margin-block: 2.5rem;
-    padding: 0;
-    overflow-x: auto;
-    color: var(--c-text-1);
-  }
-
-  .article-body pre.mermaid svg {
-    display: block;
-    margin-inline: auto;
-  }
-
-  /* Mermaid paints flowchart edge labels as white pills, which read as a
-     second, inconsistent kind of box next to the node boxes. Painting them
-     the page background keeps them masking the line they sit on without
-     looking boxed. !important is required to outrank the stylesheet Mermaid
-     injects inside the SVG (its rules carry an id selector). */
-  .article-body pre.mermaid .edgeLabel,
-  .article-body pre.mermaid .edgeLabel p,
-  .article-body pre.mermaid .labelBkg {
-    background-color: var(--c-bg) !important;
-  }
-
-  /* Edge labels otherwise inherit the page's reading line-height (1.6), which
-     splays multi-line labels apart; tighter leading keeps a two-line label
-     reading as one caption. */
-  .article-body pre.mermaid .edgeLabel {
-    line-height: 1.25;
-  }
-
-  /* Soften flowchart node boxes with a corner radius. rx/ry are SVG geometry
-     properties, settable from CSS, and CSS wins over the rx attribute Mermaid
-     may emit, so this rounds every diagram's boxes uniformly. */
-  .article-body pre.mermaid .node rect {
-    rx: 4px;
-    ry: 4px;
-  }
-
   /* Markdown wraps a standalone image in its own <p>, so vertical rhythm comes
      from the sibling-margin rule; the image just stays responsive within the
      column with a light frame to seat screenshots against the page. */

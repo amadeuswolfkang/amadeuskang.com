@@ -51,8 +51,7 @@ ogType: article
         '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>' +
         '<path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>';
 
-      // pre.mermaid is diagram source, not code; renderDiagrams owns it.
-      body.querySelectorAll('pre:not(.mermaid)').forEach((pre) => {
+      body.querySelectorAll('pre').forEach((pre) => {
         const code = pre.querySelector('code');
         const langClass = code && [...code.classList].find((c) => c.startsWith('language-'));
         const lang = langClass ? langClass.slice('language-'.length) : 'code';
@@ -82,42 +81,6 @@ ogType: article
           });
         });
       });
-    }
-
-    // Mermaid diagrams: ```mermaid fences arrive as <pre class="mermaid">
-    // holding raw diagram source (fence override in eleventy.config.mjs).
-    // The library is heavy (~3.5 MB), so it is injected only on pages that
-    // actually contain a diagram; every other article pays zero bytes. Until
-    // the script lands (or if it fails to load) the source stays visible as
-    // preformatted text, which is a readable fallback rather than a blank.
-    function renderDiagrams() {
-      if (!document.querySelector('pre.mermaid')) return;
-      const script = document.createElement('script');
-      script.src = '/vendor/mermaid/mermaid.min.js';
-      script.onload = () => {
-        // Theme every diagram from the site's own CSS tokens (read live from
-        // the stylesheet, so diagrams can never drift from the page palette)
-        // instead of a stock Mermaid theme. 'base' is the one Mermaid theme
-        // designed to be driven entirely by themeVariables.
-        const css = getComputedStyle(document.documentElement);
-        const token = (name) => css.getPropertyValue(name).trim();
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: 'base',
-          themeVariables: {
-            fontFamily: "'Exo 2', sans-serif",
-            background: token('--c-bg'),
-            primaryColor: token('--c-code-bg'),
-            primaryTextColor: token('--c-text-1'),
-            primaryBorderColor: token('--c-accent'),
-            lineColor: token('--c-text-2'),
-            edgeLabelBackground: token('--c-bg'),
-            titleColor: token('--c-text-1'),
-          },
-        });
-        mermaid.run({ querySelector: 'pre.mermaid' });
-      };
-      document.head.appendChild(script);
     }
 
     // Make each image open the full file in a new tab (skip ones already linked).
@@ -429,8 +392,8 @@ ogType: article
       };
       window.addEventListener('scroll', schedule, { passive: true });
       window.addEventListener('resize', schedule, { passive: true });
-      // Layout can shift without any scroll (late images, the lazy Mermaid
-      // pass), which moves every threshold.
+      // Layout can shift without any scroll (a late image, say), which moves
+      // every threshold.
       new ResizeObserver(schedule).observe(document.body);
       // A deep link to a trapped heading lands wrong for the same reason a
       // click on one does, so correct it before seeding rather than after, and
@@ -455,7 +418,6 @@ ogType: article
     headings.forEach((heading) => tocLabels.set(heading, heading.textContent.trim()));
 
     enhanceCodeBlocks();
-    renderDiagrams();
     linkifyImages();
     addHeadingAnchors(headings);
 

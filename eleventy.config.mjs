@@ -26,13 +26,6 @@ export default function (eleventyConfig) {
     "node_modules/katex/dist/katex.min.css": "vendor/katex/katex.min.css",
     "node_modules/katex/dist/fonts": "vendor/katex/fonts",
   });
-  // Self-hosted Mermaid browser build (no CDN). Heavy (~3.5 MB), but it is
-  // lazy-injected client-side only on article pages that actually contain a
-  // diagram (see article.njk); every other page pays nothing.
-  eleventyConfig.addPassthroughCopy({
-    "node_modules/mermaid/dist/mermaid.min.js": "vendor/mermaid/mermaid.min.js",
-  });
-
   // YYYY-MM-DD for the blog list and article kicker.
   eleventyConfig.addFilter("isoDate", (value) => {
     const d = value instanceof Date ? value : new Date(value);
@@ -54,20 +47,6 @@ export default function (eleventyConfig) {
     // it (styled in base.njk; works without JS).
     md.renderer.rules.table_open = () => '<div class="table-scroll">\n<table>\n';
     md.renderer.rules.table_close = () => '</table>\n</div>\n';
-
-    // ```mermaid fences become <pre class="mermaid"> holding the raw (escaped)
-    // diagram source, which client-side Mermaid renders to SVG (article.njk).
-    // Escaping is safe: the browser un-escapes when Mermaid reads textContent,
-    // so label markup like <br> reaches Mermaid intact. Every other fence
-    // falls through to the default renderer and gets the .code-block chrome.
-    const defaultFence = md.renderer.rules.fence;
-    md.renderer.rules.fence = (tokens, idx, options, env, self) => {
-      const token = tokens[idx];
-      if (token.info.trim() === "mermaid") {
-        return `<pre class="mermaid">${md.utils.escapeHtml(token.content)}</pre>\n`;
-      }
-      return defaultFence(tokens, idx, options, env, self);
-    };
 
     const slugify = (text) =>
       text
