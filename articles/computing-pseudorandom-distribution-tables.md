@@ -236,7 +236,6 @@ print(f"\nDone in {elapsed_ms:.3f} ms")
 
 ## Addenda
 
-- Actual critical chance $p$ is formally dubbable as critical chance over the long run. If you took stats, you should know long run is a misnomer. It is very long run, perhaps the longest run. It's the limit to infinity.
 - The average lightning flash lasts 301 ms [according to NOAA's Geostationary Lightning Mapper (GLM)](https://repository.library.noaa.gov/view/noaa/45194).
 - The most popular video game known to use PRD for crit chance is [Dota 2](https://en.wikipedia.org/wiki/Dota_2); this is where I first learned it. I spent ~1,600 hrs playing Dota 2 when I was in high school.
 

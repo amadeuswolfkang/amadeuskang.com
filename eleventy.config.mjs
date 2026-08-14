@@ -10,6 +10,10 @@ export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("index.html");
   eleventyConfig.addPassthroughCopy("img");
   eleventyConfig.addPassthroughCopy("fonts");
+  // gsap-public holds only the GSAP files the pages actually load, so this
+  // directory copy ships exactly that and nothing more. To add a plugin, drop
+  // its .min.js in beside these and script-tag it; the full 3.15.0
+  // distribution is in git history (and on npm as gsap@3.15.0).
   eleventyConfig.addPassthroughCopy("gsap-public");
   eleventyConfig.addPassthroughCopy("vendor/lenis");
   eleventyConfig.addPassthroughCopy("favicon");
