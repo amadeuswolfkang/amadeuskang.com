@@ -1,4 +1,9 @@
+# Markdown files at the repo root that are documentation, not content. Without
+# these, Eleventy would render each one as a page (template formats include md).
+#
+# node_modules and _site aren't listed: Eleventy ignores node_modules by default
+# and never reads its own output directory. CLAUDE.md stays listed even though
+# .gitignore also covers it, so it can't start rendering as a page if it's ever
+# committed.
 README.md
 CLAUDE.md
-node_modules
-_site

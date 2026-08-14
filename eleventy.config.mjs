@@ -2,8 +2,8 @@ import { feedPlugin } from "@11ty/eleventy-plugin-rss";
 import { katex } from "@mdit/plugin-katex";
 
 export default function (eleventyConfig) {
-  // Only template-process Nunjucks and Markdown. The hand-built static pages
-  // (index.html, og.html, prototype.html) are NOT templates and are left alone.
+  // Only template-process Nunjucks and Markdown. index.html is hand-built, not
+  // a template, so it's left alone and passed through below.
   eleventyConfig.setTemplateFormats(["njk", "md"]);
 
   // Pass the hand-built main site + shared assets straight through to _site.

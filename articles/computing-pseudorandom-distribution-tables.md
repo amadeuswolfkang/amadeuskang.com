@@ -134,8 +134,6 @@ Using $C_0$, I calculate for $p$ again, and we get $p = 18.89\%$.
 
 At this point, I continue iterating until we converge to the answer.
 
-### Bisection recurrence
-
 This is the bisection recurrence and midpoint equations.
 
 $$

@@ -2,7 +2,6 @@
   "name": "amadeuskang.com",
   "version": "1.0.0",
   "description": "This is the personal website of Amadeus Kang.",
-  "main": "index.js",
   "scripts": {
     "build": "eleventy",
     "serve": "eleventy --serve",
@@ -13,8 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/amadeuswolfkang/amadeuskang.com.git"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Amadeus Kang",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
