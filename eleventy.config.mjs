@@ -22,9 +22,15 @@ export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "favicon/favicon.ico": "favicon.ico" });
   // Self-hosted KaTeX assets (no CDN). The stylesheet references its fonts via
   // relative url(fonts/...), so the two must ship side by side.
+  //
+  // woff2 only. KaTeX ships each of its 20 faces three times (ttf, woff,
+  // woff2) for browsers far older than anything that can load this site. The
+  // src list in katex.min.css names woff2 first with a format() hint, so every
+  // browser takes it and never requests the other two; the site's own faces are
+  // woff2-only for the same reason.
   eleventyConfig.addPassthroughCopy({
     "node_modules/katex/dist/katex.min.css": "vendor/katex/katex.min.css",
-    "node_modules/katex/dist/fonts": "vendor/katex/fonts",
+    "node_modules/katex/dist/fonts/*.woff2": "vendor/katex/fonts",
   });
   // YYYY-MM-DD for the blog list and article kicker.
   eleventyConfig.addFilter("isoDate", (value) => {
