@@ -129,23 +129,18 @@
       :root {
         /* Primitives */
         --blue: #1a56ff;
-        --blue-light: #7a9fff;
         --blue-pale: #d6e0ff;
         --black: #28282b;
         --white: #fefefe;
 
         /* Layout */
         --content-width: 90%;
-        --section-gap: clamp(3rem, 5vw, 6rem);
-        --section-padding: clamp(1.25rem, 3vw, 3rem);
-        --body-font-size: clamp(16px, 1vw + 10px, 20px);
         --font-ui: "Archivo", sans-serif;
 
         /* Semantic tokens */
         --color-bg: #fefefe;
         --color-fg: var(--black);
         --color-accent: var(--blue);
-        --color-fg-subtle: var(--blue-light);
         --color-bg-subtle: var(--blue-pale);
         --color-bg-inverse: var(--blue);
         --color-fg-inverse: var(--white);
@@ -332,55 +327,6 @@
         z-index: 2;
       }
 
-      .section {
-        width: 65%;
-        margin: 0 auto var(--section-gap);
-        padding: var(--section-padding);
-        border: 2px solid var(--color-accent);
-        position: relative;
-        background-color: var(--color-bg);
-        padding-bottom: calc(var(--section-padding) + 3.5rem);
-        transition: box-shadow 0.2s;
-      }
-
-      .section:hover {
-        box-shadow: 8px 8px 0 0 var(--color-accent);
-      }
-
-      .section h2 {
-        font-family: "Archivo Expanded", "Archivo", sans-serif;
-        font-weight: 400;
-        font-size: calc(clamp(1.25rem, 3vw, 2.25rem) + 6px);
-        color: var(--color-accent);
-        letter-spacing: 0.02em;
-        text-transform: uppercase;
-        position: absolute;
-        top: 0;
-        left: var(--section-padding);
-        transform: translateY(-50%);
-        padding: 0 0.4rem;
-        background-color: var(--color-bg);
-      }
-
-      .section::after {
-        content: attr(data-index);
-        position: absolute;
-        top: 0.5rem;
-        right: 0.75rem;
-        font-family: "Archivo Expanded", "Archivo", sans-serif;
-        font-size: clamp(1.5rem, 3vw, 3rem);
-        font-weight: 700;
-        color: var(--color-bg-subtle);
-        line-height: 1;
-        letter-spacing: 0.02em;
-      }
-
-      .section-body {
-        font-size: var(--body-font-size);
-        line-height: 1.6;
-        max-width: 55ch;
-      }
-
       main {
         background-color: var(--color-bg);
         transform-origin: center top;
@@ -400,48 +346,6 @@
 
       main .hero {
         min-height: 100%;
-      }
-
-      .work-section {
-        background-color: var(--color-bg);
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='60'%3E%3Ccircle cx='0' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='32' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='36' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='36' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='40' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='44' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='44' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='48' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='2' cy='52' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='6' cy='52' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='0' cy='56' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='4' cy='56' r='1' fill='%23d6e0ff'/%3E%3Ccircle cx='8' cy='56' r='1' fill='%23d6e0ff'/%3E%3C/svg%3E");
-        background-size: 8px 60px;
-        background-repeat: repeat;
-        width: 95%;
-        margin: 4rem auto 0;
-        padding: 3rem 0;
-        transform-origin: center top;
-        overflow-x: clip;
-        box-shadow:
-          0 6px 8px rgba(0, 5, 20, 0.2);
-        position: relative;
-      }
-
-      .work-section .container {
-        padding-bottom: 5rem;
-      }
-
-      .work-section::before,
-      .work-section::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 36px;
-        background-color: var(--color-bg);
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='48'%3E%3Cpolygon points='27,24 25.73,26.07 25.79,28.5 23.66,29.66 22.5,31.79 20.07,31.73 18,33 15.93,31.73 13.5,31.79 12.34,29.66 10.21,28.5 10.27,26.07 9,24 10.27,21.93 10.21,19.5 12.34,18.34 13.5,16.21 15.93,16.27 18,15 20.07,16.27 22.5,16.21 23.66,18.34 25.79,19.5 25.73,21.93' fill='%231a56ff'/%3E%3C/svg%3E");
-        background-repeat: repeat-y;
-        background-size: 36px 48px;
-      }
-
-      .work-section::before {
-        left: 0;
-        border-right: 1px dashed var(--color-fg-subtle);
-      }
-
-      .work-section::after {
-        right: 0;
-        border-left: 1px dashed var(--color-fg-subtle);
       }
 
       .contact-section {
@@ -665,37 +569,6 @@
           max-width: 100%;
           overflow-wrap: break-word;
         }
-
-        .work-section {
-          width: calc(100% - 8px);
-        }
-
-        .work-section .container {
-          width: 100%;
-        }
-
-        .work-section .section {
-          width: auto;
-          margin-left: calc(24px + 0.5rem);
-          margin-right: calc(24px + 0.5rem);
-          padding-left: 0.75rem;
-          padding-right: 0.75rem;
-          padding-bottom: calc(var(--section-padding) + 2rem);
-        }
-
-        .work-section .section::after {
-          font-size: 1rem;
-        }
-
-        .work-section::before,
-        .work-section::after {
-          width: 24px;
-          background-size: 24px 32px;
-        }
-
-        .work-section .section:last-child {
-          margin-bottom: 0;
-        }
       }
 
       @media (min-width: 641px) {
@@ -743,8 +616,6 @@
   <body>
     <main>
       <nav>
-        <!-- <a href="#design">design</a>
-        <a href="#writing">writing</a> -->
         <a href="/blog/">blog</a>
         <a href="#contact">contact</a>
         <div class="nav-line"></div>
@@ -759,23 +630,6 @@
       </div>
       <img class="hero-portrait" src="img/half-portrait-solid.avif" width="638" height="589" alt="Bitmap portrait of Amadeus Kang">
     </main>
-    <!-- <div class="work-section">
-      <div class="container">
-        <section id="design" class="section" data-index="01">
-          <h2>Design</h2>
-          <p class="section-body">
-            Selected design work coming soon.
-          </p>
-        </section>
-
-        <section id="writing" class="section" data-index="02">
-          <h2>Writing</h2>
-          <p class="section-body">
-            Written articles coming soon.
-          </p>
-        </section>
-      </div>
-    </div> -->
     <section class="contact-section" id="contact">
       <p class="card-eyebrow">Here's my card.</p>
       <div class="business-card">
@@ -919,12 +773,10 @@
           },
         });
 
-        ['main', '.work-section'].forEach(sel => {
-          gsap.to(sel, {
-            scale: 0.78,
-            ease: 'none',
-            scrollTrigger: { trigger: sel, start: 'center top', end: 'bottom top', scrub: true },
-          });
+        gsap.to('main', {
+          scale: 0.78,
+          ease: 'none',
+          scrollTrigger: { trigger: 'main', start: 'center top', end: 'bottom top', scrub: true },
         });
 
       }
