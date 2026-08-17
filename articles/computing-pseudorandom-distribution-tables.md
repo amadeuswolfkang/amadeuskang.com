@@ -171,6 +171,8 @@ $$
 C_9 \approx 0.01474609375 = 1.474609375\%.
 $$
 
+For any real-world use case, I would consider using a lookup table over calculating the values in runtime. While runtime calculation is already very fast, you can ensure consistency across networks by preventing weird floating point divergences.
+
 If you're serious about precision, bisect 65 times; this will saturate float64. At this precision, precomputing C for every integer in $[1, 100]$ will still be 5 times faster than the visible flash of lightning (lightning flash $\approx 301\,\mathrm{ ms}$, precomputation on my machine $\approx 60\,\mathrm{ ms}$).
 
 Curious whether I'm right? Don't be; see it for yourself.
@@ -232,10 +234,39 @@ for percent, C in results:
 print(f"\nDone in {elapsed_ms:.3f} ms")
 ```
 
+### PRD table for [1, 100]
+
+Rounded to the nearest 0.001% via banker's rounding.
+
+| desired $p^*$ | constant $C$ | desired $p^*$ | constant $C$ | desired $p^*$ | constant $C$ | desired $p^*$ | constant $C$ |
+| ------------: | -----------: | ------------: | -----------: | ------------: | -----------: | ------------: | -----------: |
+|             1 |        0.016 |            26 |        9.118 |            51 |       31.268 |            76 |       68.421 |
+|             2 |        0.062 |            27 |        9.783 |            52 |       32.329 |            77 |       70.130 |
+|             3 |        0.139 |            28 |       10.467 |            53 |       33.412 |            78 |       71.795 |
+|             4 |        0.245 |            29 |       11.171 |            54 |       34.737 |            79 |       73.418 |
+|             5 |        0.380 |            30 |       11.895 |            55 |       36.040 |            80 |       75.000 |
+|             6 |        0.544 |            31 |       12.638 |            56 |       37.322 |            81 |       76.543 |
+|             7 |        0.736 |            32 |       13.400 |            57 |       38.584 |            82 |       78.049 |
+|             8 |        0.955 |            33 |       14.181 |            58 |       39.828 |            83 |       79.518 |
+|             9 |        1.202 |            34 |       14.981 |            59 |       41.054 |            84 |       80.952 |
+|            10 |        1.475 |            35 |       15.798 |            60 |       42.265 |            85 |       82.353 |
+|            11 |        1.774 |            36 |       16.633 |            61 |       43.460 |            86 |       83.721 |
+|            12 |        2.098 |            37 |       17.491 |            62 |       44.642 |            87 |       85.057 |
+|            13 |        2.448 |            38 |       18.362 |            63 |       45.810 |            88 |       86.364 |
+|            14 |        2.823 |            39 |       19.249 |            64 |       46.967 |            89 |       87.640 |
+|            15 |        3.222 |            40 |       20.155 |            65 |       48.113 |            90 |       88.889 |
+|            16 |        3.645 |            41 |       21.092 |            66 |       49.248 |            91 |       90.110 |
+|            17 |        4.092 |            42 |       22.036 |            67 |       50.746 |            92 |       91.304 |
+|            18 |        4.562 |            43 |       22.990 |            68 |       52.941 |            93 |       92.473 |
+|            19 |        5.055 |            44 |       23.954 |            69 |       55.072 |            94 |       93.617 |
+|            20 |        5.570 |            45 |       24.931 |            70 |       57.143 |            95 |       94.737 |
+|            21 |        6.108 |            46 |       25.987 |            71 |       59.155 |            96 |       95.833 |
+|            22 |        6.668 |            47 |       27.045 |            72 |       61.111 |            97 |       96.907 |
+|            23 |        7.249 |            48 |       28.101 |            73 |       63.014 |            98 |       97.959 |
+|            24 |        7.851 |            49 |       29.155 |            74 |       64.865 |            99 |       98.990 |
+|            25 |        8.474 |            50 |       30.210 |            75 |       66.667 |           100 |      100.000 |
+
 ## Addenda
 
 - The average lightning flash lasts 301 ms [according to NOAA's Geostationary Lightning Mapper (GLM)](https://repository.library.noaa.gov/view/noaa/45194).
-- The most popular video game known to use PRD for crit chance is [Dota 2](https://en.wikipedia.org/wiki/Dota_2); this is where I first learned it. I spent ~1,600 hrs playing Dota 2 when I was in high school.
-
-
-
+- One popular video game known to use PRD for crit chance is [Dota 2](https://en.wikipedia.org/wiki/Dota_2); this is where I first learned it. I spent ~1,600 hrs playing Dota 2 when I was in high school.
